@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sensor Data Viewer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    .data {
+      margin: 10px 0;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-right: 10px;
+    }
+  </style>
+  <!-- Add Chart.js for plotting -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <h1>Sensor Data Viewer</h1>
+  <button id="connectButton">Connect</button>
+  <button id="disconnectButton" disabled>Disconnect</button>
+  <div id="dataContainer">
+    <div class="data">GSR: <span id="gsrValue">N/A</span></div>
+    <div class="data">Accel Magnitude: <span id="accelValue">N/A</span></div>
+    <div class="data">Gyro Magnitude: <span id="gyroValue">N/A</span></div>
+    <div class="data">Magnetometer Magnitude: <span id="magValue">N/A</span></div>
+    <div class="data">IR Value: <span id="irValue">N/A</span></div>
+    <div class="data">Current Hydration Status: <span id="hydrationStatus">N/A</span></div>
+  </div>
+  <canvas id="hydrationChart" width="400" height="200"></canvas>
+
+  <script>
+    const serviceUUID = "12345678-1234-5678-1234-56789abcdef0";
+    const characteristics = {
+      gsr: "12345678-1234-5678-1234-56789abcdef1",
+      accel: "12345678-1234-5678-1234-56789abcdef2",
+      gyro: "12345678-1234-5678-1234-56789abcdef3",
+      mag: "12345678-1234-5678-1234-56789abcdef4",
+      ir: "12345678-1234-5678-1234-56789abcdef5"
+    };
+
+    let device, server, service, intervalId;
+
+    const connectButton = document.getElementById('connectButton');
+    const disconnectButton = document.getElementById('disconnectButton');
+
+    connectButton.addEventListener('click', async () => {
+      try {
+        connectButton.textContent = "Connecting...";
+        connectButton.disabled = true;
+
+        device = await navigator.bluetooth.requestDevice({
+          acceptAllDevices: true,
+          optionalServices: [serviceUUID]
+        });
+
+        device.addEventListener('gattserverdisconnected', onDisconnected);
+
+        server = await device.gatt.connect();
+        service = await server.getPrimaryService(serviceUUID);
+
+        const gsrChar = await service.getCharacteristic(characteristics.gsr);
+        const accelChar = await service.getCharacteristic(characteristics.accel);
+        const gyroChar = await service.getCharacteristic(characteristics.gyro);
+        const magChar = await service.getCharacteristic(characteristics.mag);
+        const irChar = await service.getCharacteristic(characteristics.ir);
+
+        async function updateValue(characteristic, elementId) {
+          const value = await characteristic.readValue();
+          const floatValue = value.getFloat32(0, true);
+          document.getElementById(elementId).textContent = floatValue.toFixed(2);
+          return floatValue;
+        }
+
+        const hydrationChartCtx = document.getElementById('hydrationChart').getContext('2d');
+        const hydrationChart = new Chart(hydrationChartCtx, {
+          type: 'line',
+          data: {
+            labels: [], // Time labels
+            datasets: [{
+              label: 'Hydration Status',
+              data: [], // Hydration status values
+              borderColor: 'blue',
+              borderWidth: 2,
+              fill: false,
+            }]
+          },
+          options: {
+            scales: {
+              x: {
+                title: {
+                  display: true,
+                  text: 'Time'
+                }
+              },
+              y: {
+                title: {
+                  display: true,
+                  text: 'Hydration Status'
+                }
+              }
+            }
+          }
+        });
+
+        intervalId = setInterval(async () => {
+          const gsr = await updateValue(gsrChar, 'gsrValue');
+          const accel = await updateValue(accelChar, 'accelValue');
+          const gyro = await updateValue(gyroChar, 'gyroValue');
+          const mag = await updateValue(magChar, 'magValue');
+          const ir = await updateValue(irChar, 'irValue');
+
+          // Send data to the backend and get hydration status prediction
+          try {
+            const response = await fetch('http://localhost:3000/sensor-data', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ gsr, accel, gyro, mag, ir }),
+            });
+
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            console.log('Prediction received:', result); // Log the prediction
+            const hydrationStatus = result.hydration_status;
+
+            // Update hydration status in the frontend
+            document.getElementById('hydrationStatus').textContent = hydrationStatus;
+
+            // Update the chart
+            const currentTime = new Date().toLocaleTimeString();
+            hydrationChart.data.labels.push(currentTime);
+            hydrationChart.data.datasets[0].data.push(hydrationStatus === "Dehydrated" ? 0 : hydrationStatus === "Hydrated" ? 2 : 1);
+
+            // Keep only the last 15 values
+            if (hydrationChart.data.labels.length > 15) {
+              hydrationChart.data.labels.shift();
+              hydrationChart.data.datasets[0].data.shift();
+            }
+
+            hydrationChart.update();
+          } catch (error) {
+            console.error('Error sending data or receiving prediction:', error);
+          }
+        }, 2000); // Update every 2 seconds
+
+        connectButton.textContent = "Disconnect";
+        connectButton.disabled = true;
+        disconnectButton.disabled = false;
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to connect to the sensor. Please try again.');
+        connectButton.textContent = "Connect";
+        connectButton.disabled = false;
+      }
+    });
+
+    disconnectButton.addEventListener('click', () => {
+      if (device && device.gatt.connected) {
+        device.gatt.disconnect();
+      }
+    });
+
+    function onDisconnected() {
+      clearInterval(intervalId);
+      connectButton.textContent = "Connect";
+      connectButton.disabled = false;
+      disconnectButton.disabled = true;
+
+      document.getElementById('gsrValue').textContent = "N/A";
+      document.getElementById('accelValue').textContent = "N/A";
+      document.getElementById('gyroValue').textContent = "N/A";
+      document.getElementById('magValue').textContent = "N/A";
+      document.getElementById('irValue').textContent = "N/A";
+      document.getElementById('hydrationStatus').textContent = "N/A";
+
+      alert('Device disconnected.');
+    }
+  </script>
+</body>
+</html>
