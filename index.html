@@ -4,20 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sensor Data Viewer</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-    }
-    .data {
-      margin: 10px 0;
-    }
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      margin-right: 10px;
-    }
-  </style>
+  <link rel="stylesheet" href="styles.css">
   <!-- Add Chart.js for plotting -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -32,6 +19,7 @@
     <div class="data">Magnetometer Magnitude: <span id="magValue">N/A</span></div>
     <div class="data">IR Value: <span id="irValue">N/A</span></div>
     <div class="data">Current Hydration Status: <span id="hydrationStatus">N/A</span></div>
+    <div class="data">Sensor Status: <span id="sensorStatus">N/A</span></div>
   </div>
   <canvas id="hydrationChart" width="400" height="200"></canvas>
 
@@ -116,41 +104,45 @@
           const mag = await updateValue(magChar, 'magValue');
           const ir = await updateValue(irChar, 'irValue');
 
-          // Send data to the backend and get hydration status prediction
+          let mappedStatus;
           try {
             const response = await fetch('http://localhost:3000/sensor-data', {
               method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ gsr, accel, gyro, mag, ir }),
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ gsr, accel, gyro, mag, ir })
             });
-
             if (!response.ok) {
               throw new Error(`HTTP error! status: ${response.status}`);
             }
-
             const result = await response.json();
-            console.log('Prediction received:', result); // Log the prediction
-            const hydrationStatus = result.hydration_status;
+            console.log('Prediction received:', result);
+            let predictedStatus = result.hydration_status; // ML model output
+            const validStatuses = ["Hydrated", "Dehydrated", "Possibly Dehydrated", "Mildly Dehydrated"];
+            mappedStatus = validStatuses.includes(predictedStatus) ? predictedStatus : "Unknown";
+          } catch (error) {
+            console.error('Error sending data or receiving prediction:', error);
+            mappedStatus = "Unknown";
+          }
 
-            // Update hydration status in the frontend
-            document.getElementById('hydrationStatus').textContent = hydrationStatus;
+          if (mappedStatus !== "Unknown") {
+            document.getElementById('hydrationStatus').textContent = mappedStatus;
+            document.getElementById('sensorStatus').textContent = "Stay hydrated";
+          } else {
+            document.getElementById('hydrationStatus').textContent = "Unknown";
+            document.getElementById('sensorStatus').textContent = "Wear your sensor";
+          }
 
-            // Update the chart
+          if (mappedStatus !== "Unknown") {
             const currentTime = new Date().toLocaleTimeString();
             hydrationChart.data.labels.push(currentTime);
-            hydrationChart.data.datasets[0].data.push(hydrationStatus === "Dehydrated" ? 0 : hydrationStatus === "Hydrated" ? 2 : 1);
-
-            // Keep only the last 15 values
+            hydrationChart.data.datasets[0].data.push(
+              mappedStatus.includes("Dehydrated") ? 0 : mappedStatus.includes("Hydrated") ? 2 : 1
+            );
             if (hydrationChart.data.labels.length > 15) {
               hydrationChart.data.labels.shift();
               hydrationChart.data.datasets[0].data.shift();
             }
-
             hydrationChart.update();
-          } catch (error) {
-            console.error('Error sending data or receiving prediction:', error);
           }
         }, 2000); // Update every 2 seconds
 
@@ -183,6 +175,7 @@
       document.getElementById('magValue').textContent = "N/A";
       document.getElementById('irValue').textContent = "N/A";
       document.getElementById('hydrationStatus').textContent = "N/A";
+      document.getElementById('sensorStatus').textContent = "N/A";
 
       alert('Device disconnected.');
     }

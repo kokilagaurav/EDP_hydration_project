@@ -104,10 +104,19 @@ void readAndSendSensorData() {
   }
 
   int raw_gsr = analogRead(GSR_PIN);
-  int calibrated_gsr = raw_gsr - baseline;
-  smooth_gsr = gsr_alpha * calibrated_gsr + (1 - gsr_alpha) * smooth_gsr;
+  // Compute calibrated value as difference (assumes baseline was taken with sensor not worn)
+  int calibrated_gsr = baseline - raw_gsr;
+  if (calibrated_gsr < 0) {
+    calibrated_gsr = 0;
+  }
+  // Smooth the signal using a weighted average
+  if (calibrated_gsr == 0) {
+    smooth_gsr = 0;
+  } else {
+    smooth_gsr = gsr_alpha * calibrated_gsr + (1 - gsr_alpha) * smooth_gsr;
+  }
   int threshold = 5 + (baseline * 0.01);
-  if (abs(smooth_gsr) < threshold) {
+  if (smooth_gsr < threshold) {
     smooth_gsr = 0;
   }
 
@@ -133,7 +142,7 @@ void readAndSendSensorData() {
   Serial.print("Calibrated GSR: "); Serial.println(calibrated_gsr);
 
   // BLE Send
-  gsrCharacteristic.writeValue(smooth_gsr);
+  gsrCharacteristic.writeValue((float)calibrated_gsr);
   accelCharacteristic.writeValue(accel_mag);
   gyroCharacteristic.writeValue(gyro_mag);
   magCharacteristic.writeValue(mag_mag);
