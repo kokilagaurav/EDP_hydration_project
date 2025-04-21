@@ -115,33 +115,57 @@
               throw new Error(`HTTP error! status: ${response.status}`);
             }
             const result = await response.json();
-            console.log('Prediction received:', result);
+            console.log('Prediction received from backend:', result); // Debug: Log backend response
             let predictedStatus = result.hydration_status; // ML model output
+
+            // Map backend status format to frontend format
+            const statusMapping = {
+              'dehydrated': 'Dehydrated',
+              'hydrated': 'Hydrated',
+              'mildly_dehydrated': 'Mildly Dehydrated'
+            };
+            
+            // Convert the status format if it exists in our mapping
+            if (predictedStatus in statusMapping) {
+              predictedStatus = statusMapping[predictedStatus];
+            }
+
+            // Add a fallback for invalid hydration statuses
             const validStatuses = ["Hydrated", "Dehydrated", "Possibly Dehydrated", "Mildly Dehydrated"];
             mappedStatus = validStatuses.includes(predictedStatus) ? predictedStatus : "Unknown";
+
+            // Log the received prediction for debugging
+            console.log('Received hydration status:', predictedStatus);
+            console.log('Mapped hydration status:', mappedStatus);
           } catch (error) {
             console.error('Error sending data or receiving prediction:', error);
             mappedStatus = "Unknown";
           }
 
-          if (mappedStatus !== "Unknown") {
-            document.getElementById('hydrationStatus').textContent = mappedStatus;
-            document.getElementById('sensorStatus').textContent = "Stay hydrated";
+          // Update hydration status
+          document.getElementById('hydrationStatus').textContent = mappedStatus;
+
+          // Update sensor status based on IR value
+          if (ir < 40000) {
+            document.getElementById('sensorStatus').textContent = "Please wear your sensor";
           } else {
-            document.getElementById('hydrationStatus').textContent = "Unknown";
-            document.getElementById('sensorStatus').textContent = "Wear your sensor";
+            document.getElementById('sensorStatus').textContent = mappedStatus === "Unknown" ? "Wear your sensor" : "Stay hydrated";
           }
 
+          // Update chart if status is valid
           if (mappedStatus !== "Unknown") {
             const currentTime = new Date().toLocaleTimeString();
             hydrationChart.data.labels.push(currentTime);
             hydrationChart.data.datasets[0].data.push(
               mappedStatus.includes("Dehydrated") ? 0 : mappedStatus.includes("Hydrated") ? 2 : 1
             );
+
+            // Keep only the latest 15 predictions
             if (hydrationChart.data.labels.length > 15) {
-              hydrationChart.data.labels.shift();
-              hydrationChart.data.datasets[0].data.shift();
+              hydrationChart.data.labels = hydrationChart.data.labels.slice(-15);
+              hydrationChart.data.datasets[0].data = hydrationChart.data.datasets[0].data.slice(-15);
             }
+
             hydrationChart.update();
           }
         }, 2000); // Update every 2 seconds

@@ -1,14 +1,24 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import joblib
+from tensorflow.keras.models import load_model  # Import TensorFlow's load_model
+import numpy as np  # Import numpy for array operations
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})  # Enable CORS to allow requests from the frontend
 
 # Load the pre-trained ML model, label encoder, and scaler
-model = joblib.load('hydration_model.pkl')  # Replace with the actual model file path
+model = load_model('dehydration_ann_model.h5')  # Use TensorFlow's load_model for .h5 files
 scaler = joblib.load('scaler.pkl')          # Replace with the actual scaler file path
 label_encoder = joblib.load('label_encoder.pkl')  # Replace with the actual label encoder file path
+
+# Add debugging logs to ensure the label encoder classes are loaded correctly
+print(f"Label encoder classes: {label_encoder.classes_}")  # Debug: Print label encoder classes
+
+# Ensure the label encoder has the correct classes
+if not hasattr(label_encoder, 'classes_') or len(label_encoder.classes_) == 0:
+    print("Error: Label encoder classes are not loaded correctly.")
+    raise ValueError("Label encoder classes are missing or invalid.")
 
 def predict_hydration_status(gsr, accel_magnitude, gyro_magnitude, magnetometer_magnitude, ir):
     try:
@@ -26,14 +36,40 @@ def predict_hydration_status(gsr, accel_magnitude, gyro_magnitude, magnetometer_
         print(f"Scaled features: {scaled_features}")  # Debug: Print scaled features
 
         # Predict using the ML model
-        prediction = model.predict(scaled_features)
-        print(f"Raw model prediction: {prediction}")  # Debug: Print raw prediction
+        prediction = model.predict(scaled_features)  
+        print(f"Raw model prediction shape: {prediction.shape}, values: {prediction}")  # Debug: Print raw prediction
 
-        # Decode the prediction to get the label
-        hydration_status = label_encoder.inverse_transform(prediction)[0]
-        print(f"Decoded hydration status: {hydration_status}")  # Debug: Print decoded label
-        
-        return hydration_status
+        # Get the class index with the highest probability using a safer approach
+        try:
+            # Get the prediction and find the max probability index
+            pred_array = prediction[0]  # Get first row of prediction (it's a 2D array)
+            predicted_class_index = int(np.argmax(pred_array))
+            print(f"Predicted class index: {predicted_class_index}")
+            
+            # Get the corresponding class label
+            hydration_status = label_encoder.classes_[predicted_class_index]
+            print(f"Decoded hydration status: {hydration_status}")
+            
+            return hydration_status
+            
+        except Exception as e:
+            print(f"Error during class prediction: {e}")
+            
+            # Fallback method if the above fails
+            print("Trying fallback method...")
+            try:
+                # Manual method to find the max probability index
+                pred_array = prediction[0]
+                max_val = -1
+                max_idx = 0
+                for i, val in enumerate(pred_array):
+                    if val > max_val:
+                        max_val = val
+                        max_idx = i
+                return label_encoder.classes_[max_idx]
+            except:
+                return "Unknown"
+    
     except Exception as e:
         print(f"Error during prediction: {e}")
         return "Unknown"  # Fallback to "Unknown" if any error occurs
@@ -65,6 +101,7 @@ def sensor_data():
 
         # Predict hydration status
         hydration_status = predict_hydration_status(gsr, accel_magnitude, gyro_magnitude, magnetometer_magnitude, ir)
+        print(f"Final hydration status sent to frontend: {hydration_status}")  # Debug: Print final hydration status
         return jsonify({'hydration_status': hydration_status}), 200
     except Exception as e:
         print(f'Error during prediction: {e}')
