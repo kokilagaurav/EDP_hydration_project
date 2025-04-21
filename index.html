@@ -130,6 +130,22 @@
     </div>
   </div>
 
+  <!-- Login Modal -->
+  <div id="loginModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <h2>Login</h2>
+      <form id="loginForm">
+        <label for="loginUsername">Username:</label>
+        <input type="text" id="loginUsername" placeholder="Enter your username" required><br><br>
+
+        <label for="loginPassword">Password:</label>
+        <input type="password" id="loginPassword" placeholder="Enter your password" required><br><br>
+
+        <button type="button" id="loginButton">Login</button>
+      </form>
+    </div>
+  </div>
+
   <script>
     const serviceUUID = "12345678-1234-5678-1234-56789abcdef0";
     const characteristics = {
@@ -401,7 +417,10 @@
       "Drink water first thing in the morning.",
       "Carry a water bottle with you.",
       "Eat water-rich foods like fruits and vegetables.",
-      "Avoid sugary drinks; opt for water instead."
+      "Avoid sugary drinks; opt for water instead.",
+      "Start your day with a glass of water to kickstart hydration.",
+      "Set hourly reminders to take a few sips.",
+      "Drink before, during, and after exercise to replace lost fluids."
     ];
     document.getElementById('hydrationTips').textContent = tips[Math.floor(Math.random() * tips.length)];
 
@@ -435,38 +454,25 @@
       updateHydrationTracker(-250); // Remove 250ml
     });
 
-    const achievements = [];
-    const savedAchievements = [];
+    const achievements = []; // Array to store all achievements
 
+    // Function to add a new achievement
     function addAchievement(message) {
       if (!achievements.includes(message)) {
         achievements.push(message);
+
+        // Update the latest achievement outside the "View Achievements" section
         document.getElementById('latestAchievement').textContent = `Latest Achievement: ${message}`;
 
+        // Add the new achievement to the "View Achievements" list
         const list = document.getElementById('savedAchievementsList');
         const listItem = document.createElement('li');
         listItem.textContent = message;
         list.appendChild(listItem);
-
-        saveMilestoneAchievement(message);
       }
     }
 
-    function saveMilestoneAchievement(message) {
-      const today = new Date().toLocaleDateString();
-      const savedList = document.getElementById('savedAchievementsList');
-      const listItem = document.createElement('li');
-      listItem.textContent = `Date: ${today}, Achievement: ${message}`;
-      savedList.appendChild(listItem);
-    }
-
-    document.getElementById('toggleAchievementsButton').addEventListener('click', () => {
-      const achievementsDiv = document.getElementById('viewAchievements');
-      const isHidden = achievementsDiv.style.display === 'none';
-      achievementsDiv.style.display = isHidden ? 'block' : 'none';
-      document.getElementById('toggleAchievementsButton').textContent = isHidden ? 'Hide Achievements' : 'View Achievements';
-    });
-
+    // Function to update hydration tracker and handle achievements
     function updateHydrationTracker(intake) {
       currentIntake = Math.max(0, currentIntake + intake); // Prevent negative intake
       const percentage = Math.min((currentIntake / hydrationGoal) * 100, 100);
@@ -474,7 +480,7 @@
       document.getElementById('currentIntakeValue').textContent = currentIntake;
 
       // Update motivational message based on progress
-      const hydrationMessage = document.getElementById('hydrationMessage'); // Only hydration goal-related messages
+      const hydrationMessage = document.getElementById('hydrationMessage');
       if (percentage === 0) {
         hydrationMessage.textContent = "Let's start!";
       } else if (percentage > 0 && percentage <= 25) {
@@ -500,6 +506,14 @@
         addAchievement("Drank 3x your hydration goal! Incredible!");
       }
     }
+
+    // Toggle visibility of the "View Achievements" section
+    document.getElementById('toggleAchievementsButton').addEventListener('click', () => {
+      const achievementsDiv = document.getElementById('viewAchievements');
+      const isHidden = achievementsDiv.style.display === 'none';
+      achievementsDiv.style.display = isHidden ? 'block' : 'none';
+      document.getElementById('toggleAchievementsButton').textContent = isHidden ? 'Hide Achievements' : 'View Achievements';
+    });
 
     // Analytics Dashboard
     const analyticsCtx = document.getElementById('analyticsChart').getContext('2d');
@@ -602,18 +616,64 @@
       }
     });
 
-    registerButton.addEventListener('click', () => {
+    registerButton.addEventListener('click', async () => {
       const name = document.getElementById('regName').value;
       const username = document.getElementById('regUsername').value;
       const password = document.getElementById('regPassword').value;
 
-      if (name && username && password) {
-        const user = { name, username, password };
-        localStorage.setItem('user', JSON.stringify(user));
-        alert('Registration successful!');
-        registrationModal.style.display = 'none';
-      } else {
-        alert('Please fill in all fields.');
+      try {
+        const response = await fetch('http://localhost:3000/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, username, password })
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+          alert(result.message);
+          registrationModal.style.display = 'none';
+        } else {
+          alert(result.message);
+        }
+      } catch (error) {
+        console.error('Error during registration:', error);
+        alert('Failed to register. Please try again.');
+      }
+    });
+
+    // Login Modal Logic
+    const loginModal = document.getElementById('loginModal');
+    const loginButton = document.getElementById('loginButton');
+
+    // Show login modal on page load if no user is logged in
+    window.addEventListener('load', () => {
+      if (!localStorage.getItem('loggedInUser')) {
+        loginModal.style.display = 'block';
+      }
+    });
+
+    loginButton.addEventListener('click', async () => {
+      const username = document.getElementById('loginUsername').value;
+      const password = document.getElementById('loginPassword').value;
+
+      try {
+        const response = await fetch('http://localhost:3000/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+          alert(result.message);
+          localStorage.setItem('loggedInUser', JSON.stringify(result.user));
+          loginModal.style.display = 'none';
+        } else {
+          alert(result.message);
+        }
+      } catch (error) {
+        console.error('Error during login:', error);
+        alert('Failed to login. Please try again.');
       }
     });
 
