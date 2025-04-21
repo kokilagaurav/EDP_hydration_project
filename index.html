@@ -59,6 +59,7 @@
       <div id="currentHydrationStatus">
         <h3>Current Hydration Status</h3>
         <p id="dashboardHydrationStatus">N/A</p>
+        <p id="predictedResult">Predicted Result: N/A</p> <!-- New element for predicted result -->
         <p id="lastPredictionTime">Last Updated: N/A</p>
         <p id="hydrationDuration">Duration: N/A</p>
       </div>
@@ -106,6 +107,25 @@
         </select><br><br>
 
         <button type="button" id="saveSettingsButton">Save</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Registration Modal -->
+  <div id="registrationModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <h2>Register</h2>
+      <form id="registrationForm">
+        <label for="regName">Name:</label>
+        <input type="text" id="regName" placeholder="Enter your name" required><br><br>
+
+        <label for="regUsername">Username:</label>
+        <input type="text" id="regUsername" placeholder="Enter your username" required><br><br>
+
+        <label for="regPassword">Password:</label>
+        <input type="password" id="regPassword" placeholder="Enter your password" required><br><br>
+
+        <button type="button" id="registerButton">Register</button>
       </form>
     </div>
   </div>
@@ -209,6 +229,7 @@
             const ir = await updateValue(irChar, 'irValue');
 
             let mappedStatus;
+            let predictedStatus; // Declare predictedStatus outside try block
             try {
               const response = await fetch('http://localhost:3000/sensor-data', {
                 method: 'POST',
@@ -220,7 +241,7 @@
               }
               const result = await response.json();
               console.log('Prediction received from backend:', result); // Debug: Log backend response
-              let predictedStatus = result.hydration_status; // ML model output
+              predictedStatus = result.hydration_status; // ML model output
 
               // Map backend status format to frontend format
               const statusMapping = {
@@ -228,7 +249,7 @@
                 'hydrated': 'Hydrated',
                 'mildly_dehydrated': 'Mildly Dehydrated'
               };
-              
+
               // Convert the status format if it exists in our mapping
               if (predictedStatus in statusMapping) {
                 predictedStatus = statusMapping[predictedStatus];
@@ -244,25 +265,30 @@
             } catch (error) {
               console.error('Error sending data or receiving prediction:', error);
               mappedStatus = "Unknown";
+              predictedStatus = "N/A"; // Set predictedStatus to N/A in case of error
             }
 
             // Update hydration status in both hydration tab and dashboard
             document.getElementById('hydrationStatus').textContent = mappedStatus;
             updateDashboardHydrationStatus(mappedStatus);
 
-            // Display messages and trigger notifications/alarms
-            const hydrationMessage = document.getElementById('hydrationMessage');
+            // Update predicted result in the dashboard
+            document.getElementById('predictedResult').textContent = `Predicted Result: ${predictedStatus}`;
+
+            // Display messages and trigger notifications/alarms based on predicted result
+            const dashboardHydrationMessage = document.getElementById('dashboardHydrationStatus'); // Dashboard section
+
             if (mappedStatus === "Hydrated") {
-              hydrationMessage.textContent = "Well done! Stay hydrated.";
+              dashboardHydrationMessage.textContent = "Well done! Stay hydrated.";
             } else if (mappedStatus === "Mildly Dehydrated") {
-              hydrationMessage.textContent = "Drink some electrolytes.";
+              dashboardHydrationMessage.textContent = "Drink some electrolytes.";
               showNotification("Mild dehydration detected. Please drink some electrolytes.");
             } else if (mappedStatus === "Dehydrated") {
-              hydrationMessage.textContent = "Please visit a doctor.";
+              dashboardHydrationMessage.textContent = "Please visit a doctor.";
               showNotification("Severe dehydration detected. Please visit a doctor immediately.");
               playAlarm();
             } else {
-              hydrationMessage.textContent = "";
+              dashboardHydrationMessage.textContent = "Unknown hydration status.";
             }
 
             // Update sensor status based on IR value
@@ -448,7 +474,7 @@
       document.getElementById('currentIntakeValue').textContent = currentIntake;
 
       // Update motivational message based on progress
-      const hydrationMessage = document.getElementById('hydrationMessage');
+      const hydrationMessage = document.getElementById('hydrationMessage'); // Only hydration goal-related messages
       if (percentage === 0) {
         hydrationMessage.textContent = "Let's start!";
       } else if (percentage > 0 && percentage <= 25) {
@@ -564,6 +590,39 @@
       alert('Settings saved successfully!');
       settingsModal.style.display = 'none';
     });
+
+    // Registration Modal Logic
+    const registrationModal = document.getElementById('registrationModal');
+    const registerButton = document.getElementById('registerButton');
+
+    // Show registration modal on page load if no user is registered
+    window.addEventListener('load', () => {
+      if (!localStorage.getItem('user')) {
+        registrationModal.style.display = 'block';
+      }
+    });
+
+    registerButton.addEventListener('click', () => {
+      const name = document.getElementById('regName').value;
+      const username = document.getElementById('regUsername').value;
+      const password = document.getElementById('regPassword').value;
+
+      if (name && username && password) {
+        const user = { name, username, password };
+        localStorage.setItem('user', JSON.stringify(user));
+        alert('Registration successful!');
+        registrationModal.style.display = 'none';
+      } else {
+        alert('Please fill in all fields.');
+      }
+    });
+
+    // Load user-specific data
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user) {
+      console.log(`Welcome, ${user.name}!`);
+      // Update UI with user-specific data if needed
+    }
 
     // Example usage
     updateHydrationTracker(500); // Simulate drinking 500ml
