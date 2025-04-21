@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sensor Data Viewer</title>
+  <title>HyFlow: Stay Flow</title>
   <link rel="stylesheet" href="styles.css">
   <!-- Add Chart.js for plotting -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <h1>Sensor Data Viewer</h1>
+  <h1>HyFlow: Stay Flow</h1>
   <button id="connectButton">Connect</button>
-  <button id="disconnectButton" disabled>Disconnect</button>
+  <button id="settingsButton">Settings</button>
 
   <!-- Tabs Navigation -->
   <div class="tabs">
@@ -41,10 +41,10 @@
     </div>
     <div id="gamification" class="gamification">
       <h2>Achievements</h2>
-      <ul id="achievementsList"></ul>
+      <p id="latestAchievement">Latest Achievement: None</p>
       <button id="toggleAchievementsButton">View Achievements</button>
       <div id="viewAchievements" class="saved-achievements" style="display: none;">
-        <h3>Achievements</h3>
+        <h3>All Achievements</h3>
         <ul id="savedAchievementsList"></ul>
       </div>
     </div>
@@ -56,6 +56,12 @@
     <div id="analyticsDashboard" class="dashboard">
       <h2>Hydration Analytics</h2>
       <canvas id="analyticsChart" width="400" height="200"></canvas>
+      <div id="currentHydrationStatus">
+        <h3>Current Hydration Status</h3>
+        <p id="dashboardHydrationStatus">N/A</p>
+        <p id="lastPredictionTime">Last Updated: N/A</p>
+        <p id="hydrationDuration">Duration: N/A</p>
+      </div>
     </div>
   </div>
 
@@ -72,6 +78,38 @@
     </div>
   </div>
 
+  <!-- Settings Modal -->
+  <div id="settingsModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <span id="closeSettingsModal" class="close">&times;</span>
+      <h2>Settings</h2>
+      <form id="settingsForm">
+        <label for="profilePicture">Profile Picture:</label>
+        <input type="file" id="profilePicture" accept="image/*"><br><br>
+
+        <label for="userName">Name:</label>
+        <input type="text" id="userName" placeholder="Enter your name"><br><br>
+
+        <label for="gender">Gender:</label>
+        <select id="gender">
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+          <option value="other">Other</option>
+        </select><br><br>
+
+        <label for="activityLevel">Activity Level:</label>
+        <select id="activityLevel">
+          <option value="sedentary">Sedentary</option>
+          <option value="light">Light</option>
+          <option value="moderate">Moderate</option>
+          <option value="active">Active</option>
+        </select><br><br>
+
+        <button type="button" id="saveSettingsButton">Save</button>
+      </form>
+    </div>
+  </div>
+
   <script>
     const serviceUUID = "12345678-1234-5678-1234-56789abcdef0";
     const characteristics = {
@@ -85,186 +123,185 @@
     let device, server, service, intervalId;
 
     const connectButton = document.getElementById('connectButton');
-    const disconnectButton = document.getElementById('disconnectButton');
 
     connectButton.addEventListener('click', async () => {
-      try {
-        connectButton.textContent = "Connecting...";
-        connectButton.disabled = true;
+      if (connectButton.textContent === "Connect") {
+        try {
+          connectButton.textContent = "Connecting...";
+          connectButton.disabled = true;
 
-        device = await navigator.bluetooth.requestDevice({
-          acceptAllDevices: true,
-          optionalServices: [serviceUUID]
-        });
+          device = await navigator.bluetooth.requestDevice({
+            acceptAllDevices: true,
+            optionalServices: [serviceUUID]
+          });
 
-        device.addEventListener('gattserverdisconnected', onDisconnected);
+          device.addEventListener('gattserverdisconnected', onDisconnected);
 
-        server = await device.gatt.connect();
-        service = await server.getPrimaryService(serviceUUID);
+          server = await device.gatt.connect();
+          service = await server.getPrimaryService(serviceUUID);
 
-        const gsrChar = await service.getCharacteristic(characteristics.gsr);
-        const accelChar = await service.getCharacteristic(characteristics.accel);
-        const gyroChar = await service.getCharacteristic(characteristics.gyro);
-        const magChar = await service.getCharacteristic(characteristics.mag);
-        const irChar = await service.getCharacteristic(characteristics.ir);
+          const gsrChar = await service.getCharacteristic(characteristics.gsr);
+          const accelChar = await service.getCharacteristic(characteristics.accel);
+          const gyroChar = await service.getCharacteristic(characteristics.gyro);
+          const magChar = await service.getCharacteristic(characteristics.mag);
+          const irChar = await service.getCharacteristic(characteristics.ir);
 
-        async function updateValue(characteristic, elementId) {
-          const value = await characteristic.readValue();
-          const floatValue = value.getFloat32(0, true);
-          document.getElementById(elementId).textContent = floatValue.toFixed(2);
-          return floatValue;
-        }
+          async function updateValue(characteristic, elementId) {
+            const value = await characteristic.readValue();
+            const floatValue = value.getFloat32(0, true);
+            document.getElementById(elementId).textContent = floatValue.toFixed(2);
+            return floatValue;
+          }
 
-        const hydrationChartCtx = document.getElementById('hydrationChart').getContext('2d');
-        const hydrationChart = new Chart(hydrationChartCtx, {
-          type: 'line',
-          data: {
-            labels: [], // Time labels
-            datasets: [{
-              label: 'Hydration Status',
-              data: [], // Hydration status values
-              borderColor: 'blue',
-              borderWidth: 2,
-              fill: false,
-            }]
-          },
-          options: {
-            scales: {
-              x: {
-                title: {
-                  display: true,
-                  text: 'Time'
-                }
-              },
-              y: {
-                title: {
-                  display: true,
-                  text: 'Hydration Status'
+          const hydrationChartCtx = document.getElementById('hydrationChart').getContext('2d');
+          const hydrationChart = new Chart(hydrationChartCtx, {
+            type: 'line',
+            data: {
+              labels: [], // Time labels
+              datasets: [{
+                label: 'Hydration Status',
+                data: [], // Hydration status values
+                borderColor: 'blue',
+                borderWidth: 2,
+                fill: false,
+              }]
+            },
+            options: {
+              scales: {
+                x: {
+                  title: {
+                    display: true,
+                    text: 'Time'
+                  }
+                },
+                y: {
+                  title: {
+                    display: true,
+                    text: 'Hydration Status'
+                  }
                 }
               }
             }
-          }
-        });
+          });
 
-        function showNotification(message) {
-          if (Notification.permission === "granted") {
-            new Notification(message);
-          } else if (Notification.permission !== "denied") {
-            Notification.requestPermission().then(permission => {
-              if (permission === "granted") {
-                new Notification(message);
+          function showNotification(message) {
+            if (Notification.permission === "granted") {
+              new Notification(message);
+            } else if (Notification.permission !== "denied") {
+              Notification.requestPermission().then(permission => {
+                if (permission === "granted") {
+                  new Notification(message);
+                }
+              });
+            }
+          }
+
+          function playAlarm() {
+            const alarm = new Audio('alarm.mp3'); // Ensure alarm.mp3 is in the same directory
+            alarm.play();
+          }
+
+          intervalId = setInterval(async () => {
+            const gsr = await updateValue(gsrChar, 'gsrValue');
+            const accel = await updateValue(accelChar, 'accelValue');
+            const gyro = await updateValue(gyroChar, 'gyroValue');
+            const mag = await updateValue(magChar, 'magValue');
+            const ir = await updateValue(irChar, 'irValue');
+
+            let mappedStatus;
+            try {
+              const response = await fetch('http://localhost:3000/sensor-data', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ gsr, accel, gyro, mag, ir })
+              });
+              if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
               }
-            });
-          }
+              const result = await response.json();
+              console.log('Prediction received from backend:', result); // Debug: Log backend response
+              let predictedStatus = result.hydration_status; // ML model output
+
+              // Map backend status format to frontend format
+              const statusMapping = {
+                'dehydrated': 'Dehydrated',
+                'hydrated': 'Hydrated',
+                'mildly_dehydrated': 'Mildly Dehydrated'
+              };
+              
+              // Convert the status format if it exists in our mapping
+              if (predictedStatus in statusMapping) {
+                predictedStatus = statusMapping[predictedStatus];
+              }
+
+              // Add a fallback for invalid hydration statuses
+              const validStatuses = ["Hydrated", "Dehydrated", "Possibly Dehydrated", "Mildly Dehydrated"];
+              mappedStatus = validStatuses.includes(predictedStatus) ? predictedStatus : "Unknown";
+
+              // Log the received prediction for debugging
+              console.log('Received hydration status:', predictedStatus);
+              console.log('Mapped hydration status:', mappedStatus);
+            } catch (error) {
+              console.error('Error sending data or receiving prediction:', error);
+              mappedStatus = "Unknown";
+            }
+
+            // Update hydration status in both hydration tab and dashboard
+            document.getElementById('hydrationStatus').textContent = mappedStatus;
+            updateDashboardHydrationStatus(mappedStatus);
+
+            // Display messages and trigger notifications/alarms
+            const hydrationMessage = document.getElementById('hydrationMessage');
+            if (mappedStatus === "Hydrated") {
+              hydrationMessage.textContent = "Well done! Stay hydrated.";
+            } else if (mappedStatus === "Mildly Dehydrated") {
+              hydrationMessage.textContent = "Drink some electrolytes.";
+              showNotification("Mild dehydration detected. Please drink some electrolytes.");
+            } else if (mappedStatus === "Dehydrated") {
+              hydrationMessage.textContent = "Please visit a doctor.";
+              showNotification("Severe dehydration detected. Please visit a doctor immediately.");
+              playAlarm();
+            } else {
+              hydrationMessage.textContent = "";
+            }
+
+            // Update sensor status based on IR value
+            if (ir < 40000) {
+              document.getElementById('sensorStatus').textContent = "Please wear your sensor";
+            } else {
+              document.getElementById('sensorStatus').textContent = mappedStatus === "Unknown" ? "Wear your sensor" : "Stay hydrated";
+            }
+
+            // Update chart if status is valid
+            if (mappedStatus !== "Unknown") {
+              const currentTime = new Date().toLocaleTimeString();
+              hydrationChart.data.labels.push(currentTime);
+              hydrationChart.data.datasets[0].data.push(
+                mappedStatus.includes("Dehydrated") ? 0 : mappedStatus.includes("Hydrated") ? 2 : 1
+              );
+
+              // Keep only the latest 15 predictions
+              if (hydrationChart.data.labels.length > 15) {
+                hydrationChart.data.labels = hydrationChart.data.labels.slice(-15);
+                hydrationChart.data.datasets[0].data = hydrationChart.data.datasets[0].data.slice(-15);
+              }
+
+              hydrationChart.update();
+            }
+          }, 2000); // Update every 2 seconds
+
+          connectButton.textContent = "Disconnect";
+          connectButton.disabled = false;
+        } catch (error) {
+          console.error('Error:', error);
+          alert('Failed to connect to the sensor. Please try again.');
+          connectButton.textContent = "Connect";
+          connectButton.disabled = false;
         }
-
-        function playAlarm() {
-          const alarm = new Audio('alarm.mp3'); // Ensure alarm.mp3 is in the same directory
-          alarm.play();
+      } else if (connectButton.textContent === "Disconnect") {
+        if (device && device.gatt.connected) {
+          device.gatt.disconnect();
         }
-
-        intervalId = setInterval(async () => {
-          const gsr = await updateValue(gsrChar, 'gsrValue');
-          const accel = await updateValue(accelChar, 'accelValue');
-          const gyro = await updateValue(gyroChar, 'gyroValue');
-          const mag = await updateValue(magChar, 'magValue');
-          const ir = await updateValue(irChar, 'irValue');
-
-          let mappedStatus;
-          try {
-            const response = await fetch('http://localhost:3000/sensor-data', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ gsr, accel, gyro, mag, ir })
-            });
-            if (!response.ok) {
-              throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            const result = await response.json();
-            console.log('Prediction received from backend:', result); // Debug: Log backend response
-            let predictedStatus = result.hydration_status; // ML model output
-
-            // Map backend status format to frontend format
-            const statusMapping = {
-              'dehydrated': 'Dehydrated',
-              'hydrated': 'Hydrated',
-              'mildly_dehydrated': 'Mildly Dehydrated'
-            };
-            
-            // Convert the status format if it exists in our mapping
-            if (predictedStatus in statusMapping) {
-              predictedStatus = statusMapping[predictedStatus];
-            }
-
-            // Add a fallback for invalid hydration statuses
-            const validStatuses = ["Hydrated", "Dehydrated", "Possibly Dehydrated", "Mildly Dehydrated"];
-            mappedStatus = validStatuses.includes(predictedStatus) ? predictedStatus : "Unknown";
-
-            // Log the received prediction for debugging
-            console.log('Received hydration status:', predictedStatus);
-            console.log('Mapped hydration status:', mappedStatus);
-          } catch (error) {
-            console.error('Error sending data or receiving prediction:', error);
-            mappedStatus = "Unknown";
-          }
-
-          // Update hydration status
-          document.getElementById('hydrationStatus').textContent = mappedStatus;
-
-          // Display messages and trigger notifications/alarms
-          const hydrationMessage = document.getElementById('hydrationMessage');
-          if (mappedStatus === "Hydrated") {
-            hydrationMessage.textContent = "Well done! Stay hydrated.";
-          } else if (mappedStatus === "Mildly Dehydrated") {
-            hydrationMessage.textContent = "Drink some electrolytes.";
-            showNotification("Mild dehydration detected. Please drink some electrolytes.");
-          } else if (mappedStatus === "Dehydrated") {
-            hydrationMessage.textContent = "Please visit a doctor.";
-            showNotification("Severe dehydration detected. Please visit a doctor immediately.");
-            playAlarm();
-          } else {
-            hydrationMessage.textContent = "";
-          }
-
-          // Update sensor status based on IR value
-          if (ir < 40000) {
-            document.getElementById('sensorStatus').textContent = "Please wear your sensor";
-          } else {
-            document.getElementById('sensorStatus').textContent = mappedStatus === "Unknown" ? "Wear your sensor" : "Stay hydrated";
-          }
-
-          // Update chart if status is valid
-          if (mappedStatus !== "Unknown") {
-            const currentTime = new Date().toLocaleTimeString();
-            hydrationChart.data.labels.push(currentTime);
-            hydrationChart.data.datasets[0].data.push(
-              mappedStatus.includes("Dehydrated") ? 0 : mappedStatus.includes("Hydrated") ? 2 : 1
-            );
-
-            // Keep only the latest 15 predictions
-            if (hydrationChart.data.labels.length > 15) {
-              hydrationChart.data.labels = hydrationChart.data.labels.slice(-15);
-              hydrationChart.data.datasets[0].data = hydrationChart.data.datasets[0].data.slice(-15);
-            }
-
-            hydrationChart.update();
-          }
-        }, 2000); // Update every 2 seconds
-
-        connectButton.textContent = "Disconnect";
-        connectButton.disabled = true;
-        disconnectButton.disabled = false;
-      } catch (error) {
-        console.error('Error:', error);
-        alert('Failed to connect to the sensor. Please try again.');
-        connectButton.textContent = "Connect";
-        connectButton.disabled = false;
-      }
-    });
-
-    disconnectButton.addEventListener('click', () => {
-      if (device && device.gatt.connected) {
-        device.gatt.disconnect();
       }
     });
 
@@ -272,7 +309,6 @@
       clearInterval(intervalId);
       connectButton.textContent = "Connect";
       connectButton.disabled = false;
-      disconnectButton.disabled = true;
 
       document.getElementById('gsrValue').textContent = "N/A";
       document.getElementById('accelValue').textContent = "N/A";
@@ -284,6 +320,54 @@
       document.getElementById('hydrationMessage').textContent = "";
 
       alert('Device disconnected.');
+    }
+
+    let lastPrediction = null;
+    let lastPredictionTime = null;
+    let durationInterval;
+
+    function updateDashboardHydrationStatus(status) {
+      const currentTime = new Date();
+
+      // If the status changes, reset the timer
+      if (status !== lastPrediction) {
+        lastPrediction = status;
+        lastPredictionTime = currentTime;
+
+        // Reset the duration display
+        document.getElementById('hydrationDuration').textContent = `Duration: 0 minutes`;
+
+        // Clear any existing interval and start a new one
+        if (durationInterval) clearInterval(durationInterval);
+        durationInterval = setInterval(() => {
+          const now = new Date();
+          const duration = Math.floor((now - lastPredictionTime) / 60000); // Duration in minutes
+          document.getElementById('hydrationDuration').textContent = `Duration: ${duration} minutes`;
+        }, 60000); // Update every minute
+      }
+
+      // Update the hydration status and last updated time
+      document.getElementById('dashboardHydrationStatus').textContent = status;
+      document.getElementById('lastPredictionTime').textContent = `Last Updated: ${currentTime.toLocaleTimeString()}`;
+
+      // Save the status and time to hydration analytics
+      updateAnalyticsChart(status, currentTime);
+    }
+
+    function updateAnalyticsChart(status, time) {
+      const statusMapping = { "Hydrated": 3, "Mildly Dehydrated": 2, "Dehydrated": 1, "Possibly Dehydrated": 0 };
+      const level = statusMapping[status] !== undefined ? statusMapping[status] : -1;
+
+      analyticsChart.data.labels.push(time.toLocaleTimeString());
+      analyticsChart.data.datasets[0].data.push(level);
+
+      // Keep only the latest 10 entries
+      if (analyticsChart.data.labels.length > 10) {
+        analyticsChart.data.labels.shift();
+        analyticsChart.data.datasets[0].data.shift();
+      }
+
+      analyticsChart.update();
     }
 
     // Hydration Tips
@@ -331,12 +415,13 @@
     function addAchievement(message) {
       if (!achievements.includes(message)) {
         achievements.push(message);
-        const list = document.getElementById('achievementsList');
+        document.getElementById('latestAchievement').textContent = `Latest Achievement: ${message}`;
+
+        const list = document.getElementById('savedAchievementsList');
         const listItem = document.createElement('li');
         listItem.textContent = message;
         list.appendChild(listItem);
 
-        // Save the milestone achievement
         saveMilestoneAchievement(message);
       }
     }
@@ -351,7 +436,9 @@
 
     document.getElementById('toggleAchievementsButton').addEventListener('click', () => {
       const achievementsDiv = document.getElementById('viewAchievements');
-      achievementsDiv.style.display = achievementsDiv.style.display === 'none' ? 'block' : 'none';
+      const isHidden = achievementsDiv.style.display === 'none';
+      achievementsDiv.style.display = isHidden ? 'block' : 'none';
+      document.getElementById('toggleAchievementsButton').textContent = isHidden ? 'Hide Achievements' : 'View Achievements';
     });
 
     function updateHydrationTracker(intake) {
@@ -443,6 +530,39 @@
         tabContents.forEach(content => content.style.display = 'none');
         document.getElementById(button.dataset.tab).style.display = 'block';
       });
+    });
+
+    // Settings Modal Logic
+    const settingsButton = document.getElementById('settingsButton');
+    const settingsModal = document.getElementById('settingsModal');
+    const closeSettingsModal = document.getElementById('closeSettingsModal');
+    const saveSettingsButton = document.getElementById('saveSettingsButton');
+
+    settingsButton.addEventListener('click', () => {
+      settingsModal.style.display = 'block';
+    });
+
+    closeSettingsModal.addEventListener('click', () => {
+      settingsModal.style.display = 'none';
+    });
+
+    window.addEventListener('click', (event) => {
+      if (event.target === settingsModal) {
+        settingsModal.style.display = 'none';
+      }
+    });
+
+    saveSettingsButton.addEventListener('click', () => {
+      const profilePicture = document.getElementById('profilePicture').files[0];
+      const userName = document.getElementById('userName').value;
+      const gender = document.getElementById('gender').value;
+      const activityLevel = document.getElementById('activityLevel').value;
+
+      // Save settings logic (e.g., localStorage or backend API)
+      console.log('Settings saved:', { profilePicture, userName, gender, activityLevel });
+
+      alert('Settings saved successfully!');
+      settingsModal.style.display = 'none';
     });
 
     // Example usage
