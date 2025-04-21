@@ -1,14 +1,311 @@
+/* General Styling */
 body {
-  font-family: Arial, sans-serif;
+  font-family: 'Arial', sans-serif;
   margin: 20px;
+  background-color: #f4f4f9;
+  color: #333;
+  line-height: 1.6;
 }
 
-.data {
-  margin: 10px 0;
+h1 {
+  text-align: center;
+  color: #007bff;
+  margin-bottom: 20px;
 }
 
 button {
   padding: 10px 20px;
   font-size: 16px;
   margin-right: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #007bff;
+  color: white;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+.data {
+  margin: 10px 0;
+  font-size: 1.1em;
+}
+
+#dataContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.message {
+  margin-top: 10px;
+  font-size: 1.2em;
+  font-weight: bold;
+  color: #007bff;
+  text-align: center;
+}
+
+/* Hydration Tips */
+.tips {
+  margin-top: 20px;
+  padding: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #e9f7ff;
+  font-size: 1.1em;
+  color: #007bff;
+  text-align: center;
+}
+
+/* Daily Tracker */
+.tracker {
+  margin-top: 20px;
+  padding: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #fff;
+  text-align: center;
+}
+
+.tracker h2 {
+  margin-bottom: 10px;
+  color: #007bff;
+}
+
+.tracker progress {
+  width: 100%;
+  height: 20px;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.tracker span {
+  display: block;
+  margin-top: 10px;
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+.tracker span#hydrationMessage {
+  margin-top: 10px;
+  font-size: 1.2em;
+  font-weight: bold;
+  color: #007bff;
+  text-align: center;
+}
+
+#hydrationMessages {
+  margin-top: 10px;
+  font-size: 1.2em;
+  font-weight: bold;
+  color: #007bff;
+  text-align: center;
+}
+
+.tracker p {
+  margin-top: 10px;
+  font-size: 1em;
+  color: #555;
+}
+
+/* Analytics Dashboard */
+.dashboard {
+  margin-top: 20px;
+  padding: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #fff;
+}
+
+.dashboard h2 {
+  margin-bottom: 10px;
+  color: #007bff;
+}
+
+.dashboard canvas {
+  display: block;
+  margin: 0 auto;
+}
+
+/* Goal Setting */
+.goal {
+  margin-top: 20px;
+  padding: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #fff;
+  text-align: center;
+}
+
+.goal h2 {
+  margin-bottom: 10px;
+  color: #007bff;
+}
+
+.goal input {
+  padding: 10px;
+  font-size: 16px;
+  margin-right: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.goal button {
+  background-color: #28a745;
+}
+
+.goal button:hover {
+  background-color: #218838;
+}
+
+/* Gamification */
+.gamification {
+  margin-top: 20px;
+  padding: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #fff;
+}
+
+.gamification h2 {
+  margin-bottom: 10px;
+  color: #007bff;
+}
+
+.gamification ul {
+  list-style-type: disc;
+  padding-left: 20px;
+  color: #333;
+}
+
+/* Weather Suggestions */
+.weather {
+  margin-top: 20px;
+  padding: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #e9f7ff;
+  font-size: 1.1em;
+  color: #007bff;
+  text-align: center;
+}
+
+/* Water Intake Controls */
+#waterIntakeControls {
+  margin-top: 20px;
+  padding: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #fff;
+  text-align: center;
+}
+
+#waterIntakeControls h2 {
+  margin-bottom: 10px;
+  color: #007bff;
+}
+
+#waterIntakeControls button {
+  background-color: #17a2b8;
+}
+
+#waterIntakeControls button:hover {
+  background-color: #138496;
+}
+
+/* Chart Styling */
+canvas {
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+}
+
+/* Tabs Styling */
+.tabs {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.tab-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #007bff;
+  color: white;
+  margin: 0 5px;
+  transition: background-color 0.3s ease;
+}
+
+.tab-button:hover {
+  background-color: #0056b3;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content:first-child {
+  display: block;
+}
+
+/* Raw Data Tab */
+#rawDataTab .data {
+  font-size: 1em;
+  margin: 10px 0;
+  color: #333;
+}
+
+#rawDataTab {
+  padding: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #fff;
+}
+
+/* Saved Achievements */
+.saved-achievements {
+  margin-top: 20px;
+  padding: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+.saved-achievements h3 {
+  margin-bottom: 10px;
+  color: #007bff;
+}
+
+.saved-achievements ul {
+  list-style-type: disc;
+  padding-left: 20px;
+  color: #333;
+}
+
+/* View Old Achievements */
+#viewAchievements {
+  margin-top: 20px;
+  padding: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+#viewAchievements h3 {
+  margin-bottom: 10px;
+  color: #007bff;
+}
+
+#viewAchievements ul {
+  list-style-type: disc;
+  padding-left: 20px;
+  color: #333;
 }

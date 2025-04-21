@@ -12,16 +12,65 @@
   <h1>Sensor Data Viewer</h1>
   <button id="connectButton">Connect</button>
   <button id="disconnectButton" disabled>Disconnect</button>
-  <div id="dataContainer">
-    <div class="data">GSR: <span id="gsrValue">N/A</span></div>
-    <div class="data">Accel Magnitude: <span id="accelValue">N/A</span></div>
-    <div class="data">Gyro Magnitude: <span id="gyroValue">N/A</span></div>
-    <div class="data">Magnetometer Magnitude: <span id="magValue">N/A</span></div>
-    <div class="data">IR Value: <span id="irValue">N/A</span></div>
-    <div class="data">Current Hydration Status: <span id="hydrationStatus">N/A</span></div>
-    <div class="data">Sensor Status: <span id="sensorStatus">N/A</span></div>
+
+  <!-- Tabs Navigation -->
+  <div class="tabs">
+    <button class="tab-button" data-tab="hydrationStatusTab">Hydration Status</button>
+    <button class="tab-button" data-tab="dashboardTab">Dashboard</button>
+    <button class="tab-button" data-tab="rawDataTab">Raw Data</button>
   </div>
-  <canvas id="hydrationChart" width="400" height="200"></canvas>
+
+  <!-- Hydration Status Tab -->
+  <div id="hydrationStatusTab" class="tab-content">
+    <div id="hydrationTips" class="tips"></div>
+    <div id="dailyTracker" class="tracker">
+      <h2>Daily Hydration Tracker</h2>
+      <progress id="hydrationProgress" value="0" max="100"></progress>
+      <p id="hydrationMessage">Let's start!</p>
+      <p>Current Intake: <span id="currentIntakeValue">0</span> ml / <span id="hydrationGoalValue">2000</span> ml</p>
+    </div>
+    <div id="waterIntakeControls" class="tracker">
+      <h2>Manage Water Intake</h2>
+      <button id="addWaterButton">Add 250ml</button>
+      <button id="removeWaterButton">Remove 250ml</button>
+    </div>
+    <div id="goalSetting" class="goal">
+      <h2>Set Your Hydration Goal</h2>
+      <input type="number" id="hydrationGoal" placeholder="Enter goal in ml" />
+      <button id="setGoalButton">Set Goal</button>
+    </div>
+    <div id="gamification" class="gamification">
+      <h2>Achievements</h2>
+      <ul id="achievementsList"></ul>
+      <button id="toggleAchievementsButton">View Achievements</button>
+      <div id="viewAchievements" class="saved-achievements" style="display: none;">
+        <h3>Achievements</h3>
+        <ul id="savedAchievementsList"></ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dashboard Tab -->
+  <div id="dashboardTab" class="tab-content" style="display: none;">
+    <canvas id="hydrationChart" width="400" height="200"></canvas>
+    <div id="analyticsDashboard" class="dashboard">
+      <h2>Hydration Analytics</h2>
+      <canvas id="analyticsChart" width="400" height="200"></canvas>
+    </div>
+  </div>
+
+  <!-- Raw Data Tab -->
+  <div id="rawDataTab" class="tab-content" style="display: none;">
+    <div id="dataContainer">
+      <div class="data">GSR: <span id="gsrValue">N/A</span></div>
+      <div class="data">Accel Magnitude: <span id="accelValue">N/A</span></div>
+      <div class="data">Gyro Magnitude: <span id="gyroValue">N/A</span></div>
+      <div class="data">Magnetometer Magnitude: <span id="magValue">N/A</span></div>
+      <div class="data">IR Value: <span id="irValue">N/A</span></div>
+      <div class="data">Current Hydration Status: <span id="hydrationStatus">N/A</span></div>
+      <div class="data">Sensor Status: <span id="sensorStatus">N/A</span></div>
+    </div>
+  </div>
 
   <script>
     const serviceUUID = "12345678-1234-5678-1234-56789abcdef0";
@@ -97,6 +146,23 @@
           }
         });
 
+        function showNotification(message) {
+          if (Notification.permission === "granted") {
+            new Notification(message);
+          } else if (Notification.permission !== "denied") {
+            Notification.requestPermission().then(permission => {
+              if (permission === "granted") {
+                new Notification(message);
+              }
+            });
+          }
+        }
+
+        function playAlarm() {
+          const alarm = new Audio('alarm.mp3'); // Ensure alarm.mp3 is in the same directory
+          alarm.play();
+        }
+
         intervalId = setInterval(async () => {
           const gsr = await updateValue(gsrChar, 'gsrValue');
           const accel = await updateValue(accelChar, 'accelValue');
@@ -144,6 +210,21 @@
 
           // Update hydration status
           document.getElementById('hydrationStatus').textContent = mappedStatus;
+
+          // Display messages and trigger notifications/alarms
+          const hydrationMessage = document.getElementById('hydrationMessage');
+          if (mappedStatus === "Hydrated") {
+            hydrationMessage.textContent = "Well done! Stay hydrated.";
+          } else if (mappedStatus === "Mildly Dehydrated") {
+            hydrationMessage.textContent = "Drink some electrolytes.";
+            showNotification("Mild dehydration detected. Please drink some electrolytes.");
+          } else if (mappedStatus === "Dehydrated") {
+            hydrationMessage.textContent = "Please visit a doctor.";
+            showNotification("Severe dehydration detected. Please visit a doctor immediately.");
+            playAlarm();
+          } else {
+            hydrationMessage.textContent = "";
+          }
 
           // Update sensor status based on IR value
           if (ir < 40000) {
@@ -200,9 +281,174 @@
       document.getElementById('irValue').textContent = "N/A";
       document.getElementById('hydrationStatus').textContent = "N/A";
       document.getElementById('sensorStatus').textContent = "N/A";
+      document.getElementById('hydrationMessage').textContent = "";
 
       alert('Device disconnected.');
     }
+
+    // Hydration Tips
+    const tips = [
+      "Drink water first thing in the morning.",
+      "Carry a water bottle with you.",
+      "Eat water-rich foods like fruits and vegetables.",
+      "Avoid sugary drinks; opt for water instead."
+    ];
+    document.getElementById('hydrationTips').textContent = tips[Math.floor(Math.random() * tips.length)];
+
+    // Daily Hydration Tracker
+    let hydrationGoal = null; // Default goal is null until set
+    let currentIntake = 0;
+
+    document.getElementById('setGoalButton').addEventListener('click', () => {
+      hydrationGoal = parseInt(document.getElementById('hydrationGoal').value);
+      if (hydrationGoal && hydrationGoal > 0) {
+        document.getElementById('hydrationGoalValue').textContent = hydrationGoal;
+        alert(`Hydration goal set to ${hydrationGoal} ml.`);
+      } else {
+        alert("Please enter a valid hydration goal.");
+      }
+    });
+
+    document.getElementById('addWaterButton').addEventListener('click', () => {
+      if (!hydrationGoal) {
+        alert("Please set your hydration goal first!");
+        return;
+      }
+      updateHydrationTracker(250); // Add 250ml
+    });
+
+    document.getElementById('removeWaterButton').addEventListener('click', () => {
+      if (!hydrationGoal) {
+        alert("Please set your hydration goal first!");
+        return;
+      }
+      updateHydrationTracker(-250); // Remove 250ml
+    });
+
+    const achievements = [];
+    const savedAchievements = [];
+
+    function addAchievement(message) {
+      if (!achievements.includes(message)) {
+        achievements.push(message);
+        const list = document.getElementById('achievementsList');
+        const listItem = document.createElement('li');
+        listItem.textContent = message;
+        list.appendChild(listItem);
+
+        // Save the milestone achievement
+        saveMilestoneAchievement(message);
+      }
+    }
+
+    function saveMilestoneAchievement(message) {
+      const today = new Date().toLocaleDateString();
+      const savedList = document.getElementById('savedAchievementsList');
+      const listItem = document.createElement('li');
+      listItem.textContent = `Date: ${today}, Achievement: ${message}`;
+      savedList.appendChild(listItem);
+    }
+
+    document.getElementById('toggleAchievementsButton').addEventListener('click', () => {
+      const achievementsDiv = document.getElementById('viewAchievements');
+      achievementsDiv.style.display = achievementsDiv.style.display === 'none' ? 'block' : 'none';
+    });
+
+    function updateHydrationTracker(intake) {
+      currentIntake = Math.max(0, currentIntake + intake); // Prevent negative intake
+      const percentage = Math.min((currentIntake / hydrationGoal) * 100, 100);
+      document.getElementById('hydrationProgress').value = percentage;
+      document.getElementById('currentIntakeValue').textContent = currentIntake;
+
+      // Update motivational message based on progress
+      const hydrationMessage = document.getElementById('hydrationMessage');
+      if (percentage === 0) {
+        hydrationMessage.textContent = "Let's start!";
+      } else if (percentage > 0 && percentage <= 25) {
+        hydrationMessage.textContent = "You are doing well!";
+      } else if (percentage > 25 && percentage <= 50) {
+        hydrationMessage.textContent = "We almost completed our target!";
+      } else if (percentage > 50 && percentage <= 75) {
+        hydrationMessage.textContent = "Come on, you can do it!";
+      } else if (percentage > 75 && percentage < 100) {
+        hydrationMessage.textContent = "Almost there, keep going!";
+      } else if (percentage === 100) {
+        hydrationMessage.textContent = "Yeah, you did it!";
+      }
+
+      // Add achievements dynamically based on hydration goal completion
+      if (currentIntake >= hydrationGoal * 1.5 && !achievements.includes("Drank 1.5x your hydration goal!")) {
+        addAchievement("Drank 1.5x your hydration goal!");
+      }
+      if (currentIntake >= hydrationGoal * 2 && !achievements.includes("Drank 2x your hydration goal! Amazing!")) {
+        addAchievement("Drank 2x your hydration goal! Amazing!");
+      }
+      if (currentIntake >= hydrationGoal * 3 && !achievements.includes("Drank 3x your hydration goal! Incredible!")) {
+        addAchievement("Drank 3x your hydration goal! Incredible!");
+      }
+    }
+
+    // Analytics Dashboard
+    const analyticsCtx = document.getElementById('analyticsChart').getContext('2d');
+    const analyticsChart = new Chart(analyticsCtx, {
+      type: 'bar',
+      data: {
+        labels: [], // Time labels
+        datasets: [{
+          label: 'Hydration Levels',
+          data: [], // Hydration data
+          backgroundColor: 'rgba(0, 123, 255, 0.5)',
+          borderColor: 'rgba(0, 123, 255, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        scales: {
+          x: { title: { display: true, text: 'Time' } },
+          y: { title: { display: true, text: 'Hydration Level' } }
+        }
+      }
+    });
+
+    function updateAnalyticsChart(level) {
+      const currentTime = new Date().toLocaleTimeString();
+      analyticsChart.data.labels.push(currentTime);
+      analyticsChart.data.datasets[0].data.push(level);
+      if (analyticsChart.data.labels.length > 10) {
+        analyticsChart.data.labels.shift();
+        analyticsChart.data.datasets[0].data.shift();
+      }
+      analyticsChart.update();
+    }
+
+    // Weather-Based Hydration Suggestions
+    async function fetchWeatherData() {
+      try {
+        const response = await fetch('https://api.openweathermap.org/data/2.5/weather?q=London&appid=YOUR_API_KEY');
+        const data = await response.json();
+        const temp = (data.main.temp - 273.15).toFixed(1); // Convert Kelvin to Celsius
+        document.getElementById('weatherInfo').textContent = `Current temperature: ${temp}°C. Stay hydrated!`;
+      } catch (error) {
+        document.getElementById('weatherInfo').textContent = "Failed to fetch weather data.";
+      }
+    }
+    fetchWeatherData();
+
+    // Tab Switching Logic
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        tabContents.forEach(content => content.style.display = 'none');
+        document.getElementById(button.dataset.tab).style.display = 'block';
+      });
+    });
+
+    // Example usage
+    updateHydrationTracker(500); // Simulate drinking 500ml
+    updateAnalyticsChart(2); // Simulate hydration level
+    addAchievement("Reached 50% of your hydration goal!");
   </script>
 </body>
 </html>
