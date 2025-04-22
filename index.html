@@ -34,7 +34,7 @@
       <p id="authSwitchText" style="text-align: center; color: #666; margin-top: 10px;">
         Don't have an account? <a href="#" id="switchToRegister" style="color: #0288d1; text-decoration: none; font-weight: 500;">Register</a>
       </p>
-      <p id="authError" style="color: #d32f2f; text-align: center; margin-top: 15px; display: none; font-size: 0.9em;"></p>
+      <p id="authError" style="color: #d32f2f; text-align: center; margin-top: 15px; font-size: 0.9em; background: #ffebee; padding: 10px; border-radius: 4px; display: none;"></p>
     </div>
   </div>
 
@@ -137,7 +137,7 @@
         <canvas id="analyticsChart" width="400" height="200"></canvas>
         <div id="currentHydrationStatus">
           <p id="dashboardHydrationStatus">Suggestions: N/A</p>
-          <p id="predictedResult">Predicted Result: N/A</p>
+          <p id="predictedResult">Current Hydration Status: N/A</p>
           <p id="lastPredictionTime">Last Updated: N/A</p>
           <p id="hydrationDuration">Duration: N/A</p>
         </div>
@@ -391,41 +391,36 @@
         })
         .then(res => {
           console.log('Login response status:', res.status);
-          // Check if response is ok before trying to parse JSON
-          if (!res.ok) {
-            return res.json().then(data => {
-              throw new Error(data.error || `HTTP error! status: ${res.status}`);
-            });
-          }
-          return res.json();
+          return res.json().then(data => {
+              if (!res.ok) {
+                  throw new Error(data.error || 'Invalid email or password');
+              }
+              return data;
+          });
         })
         .then(data => {
           console.log('Login successful:', data);
           
           if (!data.token) {
-            throw new Error('No token received from server');
+              throw new Error('Server error: No token received');
           }
           
-          // Store the token and user info
           localStorage.setItem('hyflow_token', data.token);
-          localStorage.setItem('hyflow_email', email); // Save email for fallback
+          localStorage.setItem('hyflow_email', email);
           userInfo = { 
-            email: email,
-            name: data.name || 'User'
+              email: email,
+              name: data.name || 'User'
           };
           authToken = data.token;
           
-          // Update UI
           authModal.style.display = 'none';
           showAppContent();
-          
-          // Load user data
           loadUserHydrationData();
         })
         .catch(err => {
           console.error('Login error:', err);
-          authError.textContent = err.message || 'Login failed. Please check your credentials.';
           authError.style.display = 'block';
+          authError.textContent = err.message || 'Login failed. Please check your credentials.';
         });
       }
     });
