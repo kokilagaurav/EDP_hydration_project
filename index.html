@@ -8,7 +8,7 @@
   <!-- Add Chart.js for plotting -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body>
+<body style="background: linear-gradient(135deg, #e0f7fa 0%, #b3e5fc 100%); font-family: 'Segoe UI', Arial, sans-serif;">
 
   <!-- Login/Registration Modal -->
   <div id="authModal" class="modal" style="display: block;">
@@ -30,27 +30,27 @@
     </div>
   </div>
 
-  <div id="appContent" style="display: none;">
-    <h1>HyFlow: Stay Flow</h1>
+  <div id="appContent" style="display: none; background: rgba(255,255,255,0.95); border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,50,0.08); padding: 32px 24px; max-width: 900px; margin: 32px auto;">
+    <h1 style="color: #0288d1; letter-spacing: 2px; text-shadow: 0 2px 8px #b3e5fc;">HyFlow: Stay Flow</h1>
     <!-- Hydration images and message -->
     <div id="hydrationImages" style="display: flex; align-items: center; gap: 24px; margin-bottom: 20px;">
-      <img src="WhatsApp Image 2025-04-22 at 11.29.21_9589edf1.jpg" alt="Drink Water" style="max-width: 120px; border-radius: 10px; border: 1px solid #ccc;">
-      <img src="WhatsApp Image 2025-04-22 at 13.03.19_503532b3.jpg" alt="Stay Hydrated" style="max-width: 120px; border-radius: 10px; border: 1px solid #ccc;">
-      <div style="font-size: 1.1em; max-width: 300px;">
+      <img src="WhatsApp Image 2025-04-22 at 11.29.21_9589edf1.jpg" alt="Drink Water" style="max-width: 120px; border-radius: 10px; border: 2px solid #4fc3f7; box-shadow: 0 2px 8px #b3e5fc;">
+      <img src="WhatsApp Image 2025-04-22 at 13.03.19_503532b3.jpg" alt="Stay Hydrated" style="max-width: 120px; border-radius: 10px; border: 2px solid #4fc3f7; box-shadow: 0 2px 8px #b3e5fc;">
+      <div style="font-size: 1.1em; max-width: 300px; color: #0277bd;">
         <strong>Hydration is essential!</strong><br>
         Drink enough water every day to keep your body and mind healthy.<br>
         Your hydration sensor helps you stay on track.
       </div>
     </div>
-    <button id="connectButton">Connect</button>
-    <button id="logoutButton" style="float: right;">Logout</button>
-    <button id="settingsButton">Settings</button>
+    <button id="connectButton" style="background: #4fc3f7; color: #fff; border: none; border-radius: 6px; padding: 10px 22px; margin-right: 8px; font-weight: bold; box-shadow: 0 2px 8px #b3e5fc; cursor: pointer;">Connect</button>
+    <button id="logoutButton" style="float: right; background: #0288d1; color: #fff; border: none; border-radius: 6px; padding: 10px 22px; font-weight: bold; box-shadow: 0 2px 8px #b3e5fc; cursor: pointer;">Logout</button>
+    <button id="settingsButton" style="background: #81d4fa; color: #01579b; border: none; border-radius: 6px; padding: 10px 22px; font-weight: bold; box-shadow: 0 2px 8px #b3e5fc; cursor: pointer;">Settings</button>
 
     <!-- Tabs Navigation -->
-    <div class="tabs">
-      <button class="tab-button" data-tab="hydrationStatusTab">Hydration Status</button>
-      <button class="tab-button" data-tab="dashboardTab">Dashboard</button>
-      <button class="tab-button" data-tab="rawDataTab">Raw Data</button>
+    <div class="tabs" style="margin-top: 24px;">
+      <button class="tab-button" data-tab="hydrationStatusTab" style="background: #e1f5fe; color: #0288d1; border: none; border-radius: 6px 6px 0 0; padding: 10px 20px; margin-right: 4px; font-weight: bold;">Hydration Status</button>
+      <button class="tab-button" data-tab="dashboardTab" style="background: #e1f5fe; color: #0288d1; border: none; border-radius: 6px 6px 0 0; padding: 10px 20px; margin-right: 4px; font-weight: bold;">Dashboard</button>
+      <button class="tab-button" data-tab="rawDataTab" style="background: #e1f5fe; color: #0288d1; border: none; border-radius: 6px 6px 0 0; padding: 10px 20px; font-weight: bold;">Raw Data</button>
     </div>
 
     <!-- Hydration Status Tab -->
