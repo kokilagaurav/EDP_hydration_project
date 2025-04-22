@@ -1,16 +1,26 @@
 /* General Styling */
 body {
-  font-family: 'Arial', sans-serif;
-  margin: 20px;
+  font-family: 'Segoe UI', 'Arial', sans-serif;
+  margin: 0;
+  padding: 20px;
   background-color: #f4f4f9;
   color: #333;
   line-height: 1.6;
+  min-height: 100vh;
 }
 
 h1 {
   text-align: center;
-  color: #007bff;
-  margin-bottom: 20px;
+  color: #0288d1;
+  margin-bottom: 24px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+h2 {
+  color: #0288d1;
+  margin-bottom: 16px;
+  font-weight: 500;
 }
 
 button {
@@ -18,98 +28,205 @@ button {
   font-size: 16px;
   margin-right: 10px;
   border: none;
-  border-radius: 5px;
+  border-radius: 6px;
   cursor: pointer;
   background-color: #007bff;
   color: white;
-  transition: background-color 0.3s ease;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(0,123,255,0.3);
 }
 
 button:hover {
-  background-color: #0056b3;
+  background-color: #0069d9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,123,255,0.4);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+.main-button {
+  padding: 10px 22px;
+  font-weight: bold;
+  border-radius: 6px;
+}
+
+.home-btn {
+  background: #e1f5fe;
+  color: #0288d1;
+  border: none;
+}
+
+.connect-btn {
+  background: #4fc3f7;
+  color: #fff;
+  border: none; 
+}
+
+.settings-btn {
+  background: #81d4fa;
+  color: #01579b;
+  border: none;
+}
+
+.logout-btn {
+  background: #0288d1;
+  color: #fff;
+  border: none;
 }
 
 .data {
-  margin: 10px 0;
-  font-size: 1.1em;
+  margin: 12px 0;
+  font-size: 1.05em;
+  padding: 12px;
+  background: rgba(255,255,255,0.8);
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
 
 #dataContainer {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 15px;
-  margin-bottom: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
 }
 
 .message {
-  margin-top: 10px;
+  margin-top: 12px;
   font-size: 1.2em;
   font-weight: bold;
   color: #007bff;
   text-align: center;
+}
+
+/* Card Styling */
+.feature-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 16px rgba(0,0,50,0.05);
+  margin-bottom: 24px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0,0,50,0.08);
+}
+
+.welcome-card {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 16px rgba(0,0,50,0.06);
+  transition: transform 0.2s ease;
+}
+
+.info-card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.info-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+.info-card h3 {
+  color: #0288d1;
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-size: 1.2em;
+}
+
+/* Vertical Tab Styling */
+.vertical-tabs {
+  background: transparent;
+}
+
+.vertical-tab {
+  background: rgba(225,245,254,0.9);
+  color: #0288d1;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-weight: bold;
+  min-width: 180px;
+  text-align: right;
+  box-shadow: 0 2px 8px rgba(0,123,255,0.15);
+  transition: all 0.2s ease;
+  margin-bottom: 5px;
+}
+
+.vertical-tab:hover {
+  background: #e1f5fe;
+  transform: translateX(-5px);
+  box-shadow: 0 4px 12px rgba(0,123,255,0.2);
+}
+
+.vertical-tab.active {
+  background: #4fc3f7;
+  color: white;
+}
+
+.tab-icon {
+  margin-right: 8px;
+  font-style: normal;
 }
 
 /* Hydration Tips */
 .tips {
-  margin-top: 20px;
-  padding: 15px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  background-color: #e9f7ff;
+  margin: 20px 0;
+  padding: 18px 24px;
+  border-radius: 10px;
+  background-color: #e3f2fd;
   font-size: 1.1em;
-  color: #007bff;
+  color: #0277bd;
   text-align: center;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.04);
 }
 
 /* Daily Tracker */
 .tracker {
-  margin-top: 20px;
-  padding: 15px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+  margin: 24px 0;
+  padding: 24px;
+  border-radius: 12px;
   background-color: #fff;
   text-align: center;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  transition: transform 0.2s ease;
+}
+
+.tracker:hover {
+  transform: translateY(-3px);
 }
 
 .tracker h2 {
-  margin-bottom: 10px;
-  color: #007bff;
+  margin-bottom: 16px;
+  color: #0288d1;
 }
 
 .tracker progress {
   width: 100%;
-  height: 20px;
-  border-radius: 5px;
+  height: 24px;
+  border-radius: 12px;
   overflow: hidden;
+  margin: 12px 0;
 }
 
-.tracker span {
-  display: block;
-  margin-top: 10px;
-  font-size: 1.2em;
-  font-weight: bold;
+.tracker progress::-webkit-progress-bar {
+  background-color: #f0f0f0;
+  border-radius: 12px;
 }
 
-.tracker span#hydrationMessage {
-  margin-top: 10px;
-  font-size: 1.2em;
-  font-weight: bold;
-  color: #007bff;
-  text-align: center;
-}
-
-#hydrationMessages {
-  margin-top: 10px;
-  font-size: 1.2em;
-  font-weight: bold;
-  color: #007bff;
-  text-align: center;
-}
-
-.tracker p {
-  margin-top: 10px;
-  font-size: 1em;
-  color: #555;
+.tracker progress::-webkit-progress-value {
+  background: linear-gradient(90deg, #81d4fa, #29b6f6);
+  border-radius: 12px;
 }
 
 /* Analytics Dashboard */
@@ -219,10 +336,11 @@ button:hover {
 
 /* Chart Styling */
 canvas {
-  background-color: #f9f9f9;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  padding: 10px;
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 16px rgba(0,0,50,0.06);
+  margin: 16px 0;
 }
 
 /* Tabs Styling */
@@ -250,10 +368,20 @@ canvas {
 
 .tab-content {
   display: none;
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+  animation: fadeIn 0.5s;
 }
 
 .tab-content:first-child {
   display: block;
+}
+
+@keyframes fadeIn {
+  from {opacity: 0;}
+  to {opacity: 1;}
 }
 
 /* Raw Data Tab */

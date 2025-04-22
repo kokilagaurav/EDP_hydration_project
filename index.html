@@ -12,8 +12,8 @@
 
   <!-- Login/Registration Modal -->
   <div id="authModal" class="modal" style="display: block;">
-    <div class="modal-content" style="max-width: 350px; margin: 10% auto;">
-      <h2 id="authTitle">Login</h2>
+    <div class="modal-content" style="max-width: 350px; margin: 10% auto; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,50,0.1);">
+      <h2 id="authTitle" style="color: #0277bd; text-align: center; margin-bottom: 24px;">Login</h2>
       <form id="authForm">
         <div id="registerFields" style="display: none;">
           <label for="registerName">Name:</label>
@@ -30,38 +30,67 @@
     </div>
   </div>
 
-  <div id="appContent" style="display: none; background: rgba(255,255,255,0.95); border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,50,0.08); padding: 32px 24px; max-width: 900px; margin: 32px auto;">
-    <h1 style="color: #0288d1; letter-spacing: 2px; text-shadow: 0 2px 8px #b3e5fc;">HyFlow: Stay Flow</h1>
+  <div id="appContent" style="display: none; background: rgba(255,255,255,0.95); border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,50,0.1); padding: 32px 24px; max-width: 1000px; margin: 24px auto;">
+    <h1 style="color: #0288d1; letter-spacing: 2px; text-shadow: 0 2px 8px #b3e5fc; text-align: center; font-size: 2.2em; margin-bottom: 24px;">HyFlow: Stay Flow</h1>
+    
     <!-- Buttons Row -->
-    <div style="margin-bottom: 16px;">
-      <button id="homeButton" style="background: #e1f5fe; color: #0288d1; border: none; border-radius: 6px; padding: 10px 22px; font-weight: bold; margin-right: 8px; box-shadow: 0 2px 8px #b3e5fc; cursor: pointer;">Home</button>
-      <button id="connectButton" style="background: #4fc3f7; color: #fff; border: none; border-radius: 6px; padding: 10px 22px; margin-right: 8px; font-weight: bold; box-shadow: 0 2px 8px #b3e5fc; cursor: pointer;">Connect</button>
-      <button id="logoutButton" style="background: #0288d1; color: #fff; border: none; border-radius: 6px; padding: 10px 22px; font-weight: bold; margin-right: 8px; box-shadow: 0 2px 8px #b3e5fc; cursor: pointer;">Logout</button>
-      <button class="tab-button" data-tab="settingsTab" style="background: #81d4fa; color: #01579b; border: none; border-radius: 6px; padding: 10px 22px; font-weight: bold; box-shadow: 0 2px 8px #b3e5fc; cursor: pointer;">Settings</button>
+    <div style="margin-bottom: 24px; display: flex; justify-content: space-between;">
+      <div>
+        <button id="homeButton" class="main-button home-btn">Home</button>
+        <button id="connectButton" class="main-button connect-btn">Connect</button>
+        <button class="tab-button main-button settings-btn" data-tab="settingsTab">Settings</button>
+      </div>
+      <button id="logoutButton" class="main-button logout-btn">Logout</button>
     </div>
 
     <!-- Vertical Tabs Navigation (top right) -->
-    <div style="position: absolute; top: 48px; right: 48px; display: flex; flex-direction: column; align-items: flex-end; z-index: 10;">
-      <div class="tabs" style="display: flex; flex-direction: column; gap: 8px;">
-        <button class="tab-button" data-tab="hydrationStatusTab" style="background: #e1f5fe; color: #0288d1; border: none; border-radius: 6px; padding: 10px 24px; font-weight: bold; min-width: 160px; text-align: right;">Hydration Status</button>
-        <button class="tab-button" data-tab="dashboardTab" style="background: #e1f5fe; color: #0288d1; border: none; border-radius: 6px; padding: 10px 24px; font-weight: bold; min-width: 160px; text-align: right;">Dashboard</button>
-        <button class="tab-button" data-tab="rawDataTab" style="background: #e1f5fe; color: #0288d1; border: none; border-radius: 6px; padding: 10px 24px; font-weight: bold; min-width: 160px; text-align: right;">Raw Data</button>
+    <div style="position: absolute; top: 100px; right: 48px; display: flex; flex-direction: column; align-items: flex-end; z-index: 10;">
+      <div class="tabs vertical-tabs" style="display: flex; flex-direction: column; gap: 10px;">
+        <button class="tab-button vertical-tab" data-tab="hydrationStatusTab">
+          <i class="tab-icon">💧</i> Hydration Status
+        </button>
+        <button class="tab-button vertical-tab" data-tab="dashboardTab">
+          <i class="tab-icon">📊</i> Dashboard
+        </button>
+        <button class="tab-button vertical-tab" data-tab="rawDataTab">
+          <i class="tab-icon">📋</i> Raw Data
+        </button>
       </div>
     </div>
 
     <!-- Home Section -->
-    <div id="homeSection" style="margin-top: 24px;">
-      <div id="hydrationImages" style="display: flex; align-items: center; gap: 24px; margin-bottom: 20px;">
-        <img src="WhatsApp Image 2025-04-22 at 11.29.21_9589edf1.jpg" alt="Drink Water" style="max-width: 120px; border-radius: 10px; border: 2px solid #4fc3f7; box-shadow: 0 2px 8px #b3e5fc;">
-        <img src="WhatsApp Image 2025-04-22 at 13.03.19_503532b3.jpg" alt="Stay Hydrated" style="max-width: 120px; border-radius: 10px; border: 2px solid #4fc3f7; box-shadow: 0 2px 8px #b3e5fc;">
-        <div style="font-size: 1.1em; max-width: 300px; color: #0277bd;">
-          <strong>Hydration is essential!</strong><br>
+    <div id="homeSection" style="margin-top: 24px; max-width: 800px;">
+      <div class="welcome-card">
+        <h2 style="color: #0288d1; margin-bottom: 16px;">Welcome to HyFlow!</h2>
+        <p style="color: #555; margin-bottom: 20px;">Track your hydration levels, set goals, and maintain optimal health with our smart hydration monitoring system.</p>
+      </div>
+      
+      <div id="hydrationImages" class="feature-card" style="display: flex; align-items: center; gap: 24px; margin: 24px 0;">
+        <img src="WhatsApp Image 2025-04-22 at 11.29.21_9589edf1.jpg" alt="Drink Water" style="max-width: 140px; border-radius: 12px; border: none; box-shadow: 0 6px 16px rgba(0,0,150,0.1);">
+        <img src="WhatsApp Image 2025-04-22 at 13.03.19_503532b3.jpg" alt="Stay Hydrated" style="max-width: 140px; border-radius: 12px; border: none; box-shadow: 0 6px 16px rgba(0,0,150,0.1);">
+        <div style="font-size: 1.1em; max-width: 340px; color: #0277bd;">
+          <strong style="font-size: 1.2em; display: block; margin-bottom: 8px;">Hydration is essential!</strong>
           Drink enough water every day to keep your body and mind healthy.<br>
-          Your hydration sensor helps you stay on track.
+          Your hydration sensor helps you stay on track and maintain optimal hydration levels throughout the day.
+        </div>
+      </div>
+      
+      <div class="info-cards" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 24px;">
+        <div class="info-card">
+          <h3>Why Hydration Matters</h3>
+          <p>Proper hydration improves energy levels, brain function, and physical performance while preventing headaches.</p>
+        </div>
+        <div class="info-card">
+          <h3>How It Works</h3>
+          <p>Our sensor measures your hydration status in real-time using bioimpedance and advanced ML algorithms.</p>
+        </div>
+        <div class="info-card">
+          <h3>Get Started</h3>
+          <p>Click "Connect" to pair your sensor, then set your daily hydration goal in the Hydration Status tab.</p>
         </div>
       </div>
     </div>
-
+    
     <!-- Hydration Status Tab -->
     <div id="hydrationStatusTab" class="tab-content">
       <div id="hydrationTips" class="tips"></div>
