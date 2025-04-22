@@ -32,25 +32,34 @@
 
   <div id="appContent" style="display: none; background: rgba(255,255,255,0.95); border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,50,0.08); padding: 32px 24px; max-width: 900px; margin: 32px auto;">
     <h1 style="color: #0288d1; letter-spacing: 2px; text-shadow: 0 2px 8px #b3e5fc;">HyFlow: Stay Flow</h1>
-    <!-- Hydration images and message -->
-    <div id="hydrationImages" style="display: flex; align-items: center; gap: 24px; margin-bottom: 20px;">
-      <img src="WhatsApp Image 2025-04-22 at 11.29.21_9589edf1.jpg" alt="Drink Water" style="max-width: 120px; border-radius: 10px; border: 2px solid #4fc3f7; box-shadow: 0 2px 8px #b3e5fc;">
-      <img src="WhatsApp Image 2025-04-22 at 13.03.19_503532b3.jpg" alt="Stay Hydrated" style="max-width: 120px; border-radius: 10px; border: 2px solid #4fc3f7; box-shadow: 0 2px 8px #b3e5fc;">
-      <div style="font-size: 1.1em; max-width: 300px; color: #0277bd;">
-        <strong>Hydration is essential!</strong><br>
-        Drink enough water every day to keep your body and mind healthy.<br>
-        Your hydration sensor helps you stay on track.
+    <!-- Buttons Row -->
+    <div style="margin-bottom: 16px;">
+      <button id="homeButton" style="background: #e1f5fe; color: #0288d1; border: none; border-radius: 6px; padding: 10px 22px; font-weight: bold; margin-right: 8px; box-shadow: 0 2px 8px #b3e5fc; cursor: pointer;">Home</button>
+      <button id="connectButton" style="background: #4fc3f7; color: #fff; border: none; border-radius: 6px; padding: 10px 22px; margin-right: 8px; font-weight: bold; box-shadow: 0 2px 8px #b3e5fc; cursor: pointer;">Connect</button>
+      <button id="logoutButton" style="background: #0288d1; color: #fff; border: none; border-radius: 6px; padding: 10px 22px; font-weight: bold; margin-right: 8px; box-shadow: 0 2px 8px #b3e5fc; cursor: pointer;">Logout</button>
+      <button class="tab-button" data-tab="settingsTab" style="background: #81d4fa; color: #01579b; border: none; border-radius: 6px; padding: 10px 22px; font-weight: bold; box-shadow: 0 2px 8px #b3e5fc; cursor: pointer;">Settings</button>
+    </div>
+
+    <!-- Vertical Tabs Navigation (top right) -->
+    <div style="position: absolute; top: 48px; right: 48px; display: flex; flex-direction: column; align-items: flex-end; z-index: 10;">
+      <div class="tabs" style="display: flex; flex-direction: column; gap: 8px;">
+        <button class="tab-button" data-tab="hydrationStatusTab" style="background: #e1f5fe; color: #0288d1; border: none; border-radius: 6px; padding: 10px 24px; font-weight: bold; min-width: 160px; text-align: right;">Hydration Status</button>
+        <button class="tab-button" data-tab="dashboardTab" style="background: #e1f5fe; color: #0288d1; border: none; border-radius: 6px; padding: 10px 24px; font-weight: bold; min-width: 160px; text-align: right;">Dashboard</button>
+        <button class="tab-button" data-tab="rawDataTab" style="background: #e1f5fe; color: #0288d1; border: none; border-radius: 6px; padding: 10px 24px; font-weight: bold; min-width: 160px; text-align: right;">Raw Data</button>
       </div>
     </div>
-    <button id="connectButton" style="background: #4fc3f7; color: #fff; border: none; border-radius: 6px; padding: 10px 22px; margin-right: 8px; font-weight: bold; box-shadow: 0 2px 8px #b3e5fc; cursor: pointer;">Connect</button>
-    <button id="logoutButton" style="float: right; background: #0288d1; color: #fff; border: none; border-radius: 6px; padding: 10px 22px; font-weight: bold; box-shadow: 0 2px 8px #b3e5fc; cursor: pointer;">Logout</button>
-    <button id="settingsButton" style="background: #81d4fa; color: #01579b; border: none; border-radius: 6px; padding: 10px 22px; font-weight: bold; box-shadow: 0 2px 8px #b3e5fc; cursor: pointer;">Settings</button>
 
-    <!-- Tabs Navigation -->
-    <div class="tabs" style="margin-top: 24px;">
-      <button class="tab-button" data-tab="hydrationStatusTab" style="background: #e1f5fe; color: #0288d1; border: none; border-radius: 6px 6px 0 0; padding: 10px 20px; margin-right: 4px; font-weight: bold;">Hydration Status</button>
-      <button class="tab-button" data-tab="dashboardTab" style="background: #e1f5fe; color: #0288d1; border: none; border-radius: 6px 6px 0 0; padding: 10px 20px; margin-right: 4px; font-weight: bold;">Dashboard</button>
-      <button class="tab-button" data-tab="rawDataTab" style="background: #e1f5fe; color: #0288d1; border: none; border-radius: 6px 6px 0 0; padding: 10px 20px; font-weight: bold;">Raw Data</button>
+    <!-- Home Section -->
+    <div id="homeSection" style="margin-top: 24px;">
+      <div id="hydrationImages" style="display: flex; align-items: center; gap: 24px; margin-bottom: 20px;">
+        <img src="WhatsApp Image 2025-04-22 at 11.29.21_9589edf1.jpg" alt="Drink Water" style="max-width: 120px; border-radius: 10px; border: 2px solid #4fc3f7; box-shadow: 0 2px 8px #b3e5fc;">
+        <img src="WhatsApp Image 2025-04-22 at 13.03.19_503532b3.jpg" alt="Stay Hydrated" style="max-width: 120px; border-radius: 10px; border: 2px solid #4fc3f7; box-shadow: 0 2px 8px #b3e5fc;">
+        <div style="font-size: 1.1em; max-width: 300px; color: #0277bd;">
+          <strong>Hydration is essential!</strong><br>
+          Drink enough water every day to keep your body and mind healthy.<br>
+          Your hydration sensor helps you stay on track.
+        </div>
+      </div>
     </div>
 
     <!-- Hydration Status Tab -->
@@ -111,37 +120,32 @@
         <div class="data">Sensor Status: <span id="sensorStatus">N/A</span></div>
       </div>
     </div>
-  </div>
 
-  <!-- Settings Modal -->
-  <div id="settingsModal" class="modal" style="display: none;">
-    <div class="modal-content">
-      <span id="closeSettingsModal" class="close">&times;</span>
-      <h2>Settings</h2>
-      <form id="settingsForm">
-        <label for="profilePicture">Profile Picture:</label>
-        <input type="file" id="profilePicture" accept="image/*"><br><br>
-
-        <label for="userName">Name:</label>
-        <input type="text" id="userName" placeholder="Enter your name"><br><br>
-
-        <label for="gender">Gender:</label>
-        <select id="gender">
-          <option value="male">Male</option>
-          <option value="female">Female</option>
-          <option value="other">Other</option>
-        </select><br><br>
-
-        <label for="activityLevel">Activity Level:</label>
-        <select id="activityLevel">
-          <option value="sedentary">Sedentary</option>
-          <option value="light">Light</option>
-          <option value="moderate">Moderate</option>
-          <option value="active">Active</option>
-        </select><br><br>
-
-        <button type="button" id="saveSettingsButton">Save</button>
-      </form>
+    <!-- Settings Tab (as a tab, not modal) -->
+    <div id="settingsTab" class="tab-content" style="display: none;">
+      <div class="modal-content" style="box-shadow:none; border-radius:0; max-width:none;">
+        <h2>Settings</h2>
+        <form id="settingsForm">
+          <label for="profilePicture">Profile Picture:</label>
+          <input type="file" id="profilePicture" accept="image/*"><br><br>
+          <label for="userName">Name:</label>
+          <input type="text" id="userName" placeholder="Enter your name"><br><br>
+          <label for="gender">Gender:</label>
+          <select id="gender">
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+          </select><br><br>
+          <label for="activityLevel">Activity Level:</label>
+          <select id="activityLevel">
+            <option value="sedentary">Sedentary</option>
+            <option value="light">Light</option>
+            <option value="moderate">Moderate</option>
+            <option value="active">Active</option>
+          </select><br><br>
+          <button type="button" id="saveSettingsButton">Save</button>
+        </form>
+      </div>
     </div>
   </div>
 
@@ -223,7 +227,7 @@
           userInfo = user;
           authToken = token;
           authModal.style.display = 'none';
-          appContent.style.display = 'block';
+          showAppContent();
           loadUserHydrationData(); // Load user-specific data
         })
         .catch(() => {
@@ -309,7 +313,7 @@
             userInfo = { email: email, name: data.name };
             authToken = data.token;
             authModal.style.display = 'none';
-            appContent.style.display = 'block';
+            showAppContent();
             loadUserHydrationData();
           } else {
             authError.textContent = 'Unexpected response format.';
@@ -361,7 +365,7 @@
           
           // Update UI
           authModal.style.display = 'none';
-          appContent.style.display = 'block';
+          showAppContent();
           
           // Load user data
           loadUserHydrationData();
@@ -801,43 +805,29 @@
 
     tabButtons.forEach(button => {
       button.addEventListener('click', () => {
+        document.getElementById('homeSection').style.display = 'none';
         tabContents.forEach(content => content.style.display = 'none');
         document.getElementById(button.dataset.tab).style.display = 'block';
       });
     });
 
-    // Settings Modal Logic
-    const settingsButton = document.getElementById('settingsButton');
-    const settingsModal = document.getElementById('settingsModal');
-    const closeSettingsModal = document.getElementById('closeSettingsModal');
-    const saveSettingsButton = document.getElementById('saveSettingsButton');
+    // Hide all main sections except home
+    function showHomeSection() {
+      document.getElementById('homeSection').style.display = 'block';
+      document.getElementById('hydrationStatusTab').style.display = 'none';
+      document.getElementById('dashboardTab').style.display = 'none';
+      document.getElementById('rawDataTab').style.display = 'none';
+      document.getElementById('settingsTab').style.display = 'none';
+    }
 
-    settingsButton.addEventListener('click', () => {
-      settingsModal.style.display = 'block';
-    });
+    // Home button logic
+    document.getElementById('homeButton').addEventListener('click', showHomeSection);
 
-    closeSettingsModal.addEventListener('click', () => {
-      settingsModal.style.display = 'none';
-    });
-
-    window.addEventListener('click', (event) => {
-      if (event.target === settingsModal) {
-        settingsModal.style.display = 'none';
-      }
-    });
-
-    saveSettingsButton.addEventListener('click', () => {
-      const profilePicture = document.getElementById('profilePicture').files[0];
-      const userName = document.getElementById('userName').value;
-      const gender = document.getElementById('gender').value;
-      const activityLevel = document.getElementById('activityLevel').value;
-
-      // Save settings logic (e.g., localStorage or backend API)
-      console.log('Settings saved:', { profilePicture, userName, gender, activityLevel });
-
-      alert('Settings saved successfully!');
-      settingsModal.style.display = 'none';
-    });
+    // On login, show home section by default
+    function showAppContent() {
+      appContent.style.display = 'block';
+      showHomeSection();
+    }
 
     // Logout button logic
     document.getElementById('logoutButton').addEventListener('click', () => {
