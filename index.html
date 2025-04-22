@@ -12,21 +12,29 @@
 
   <!-- Login/Registration Modal -->
   <div id="authModal" class="modal" style="display: block;">
-    <div class="modal-content" style="max-width: 350px; margin: 10% auto; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,50,0.1);">
-      <h2 id="authTitle" style="color: #0277bd; text-align: center; margin-bottom: 24px;">Login</h2>
-      <form id="authForm">
+    <div class="modal-content" style="max-width: 400px; margin: 5% auto; border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,50,0.15); padding: 32px; background: linear-gradient(145deg, #ffffff, #f5f5f5);">
+      <h1 style="color: #0288d1; text-align: center; font-size: 2.4em; margin-bottom: 15px; font-weight: 600;">Welcome to HyFlow</h1>
+      <p style="color: #555; text-align: center; margin-bottom: 30px; font-size: 1.1em; line-height: 1.6;">Your smart hydration companion. Stay healthy, stay hydrated! 💧</p>
+      <h2 id="authTitle" style="color: #0277bd; text-align: center; margin-bottom: 30px; font-size: 1.8em; font-weight: 500;">Login</h2>
+      <form id="authForm" style="width: 100%;">
         <div id="registerFields" style="display: none;">
-          <label for="registerName">Name:</label>
-          <input type="text" id="registerName" placeholder="Enter your name" required><br><br>
+          <label for="registerName" style="color: #444; font-size: 1.1em; margin-bottom: 8px; display: block;">Name:</label>
+          <input type="text" id="registerName" placeholder="Enter your name" required 
+            style="width: 100%; padding: 12px; margin-bottom: 20px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1em; transition: all 0.3s ease;"><br>
         </div>
-        <label for="authEmail">Email:</label>
-        <input type="email" id="authEmail" placeholder="Enter your email" required><br><br>
-        <label for="authPassword">Password:</label>
-        <input type="password" id="authPassword" placeholder="Enter your password" required><br><br>
-        <button type="submit" id="authSubmitButton">Login</button>
+        <label for="authEmail" style="color: #444; font-size: 1.1em; margin-bottom: 8px; display: block;">Email:</label>
+        <input type="email" id="authEmail" placeholder="Enter your email" required 
+          style="width: 100%; padding: 12px; margin-bottom: 20px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1em; transition: all 0.3s ease;"><br>
+        <label for="authPassword" style="color: #444; font-size: 1.1em; margin-bottom: 8px; display: block;">Password:</label>
+        <input type="password" id="authPassword" placeholder="Enter your password" required 
+          style="width: 100%; padding: 12px; margin-bottom: 25px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1em; transition: all 0.3s ease;"><br>
+        <button type="submit" id="authSubmitButton" 
+          style="width: 100%; padding: 14px; background: #0288d1; color: white; border: none; border-radius: 8px; font-size: 1.1em; font-weight: 500; cursor: pointer; transition: all 0.3s ease; margin-bottom: 20px;">Login</button>
       </form>
-      <p id="authSwitchText">Don't have an account? <a href="#" id="switchToRegister">Register</a></p>
-      <p id="authError" style="color: red; display: none;"></p>
+      <p id="authSwitchText" style="text-align: center; color: #666; margin-top: 10px;">
+        Don't have an account? <a href="#" id="switchToRegister" style="color: #0288d1; text-decoration: none; font-weight: 500;">Register</a>
+      </p>
+      <p id="authError" style="color: #d32f2f; text-align: center; margin-top: 15px; display: none; font-size: 0.9em;"></p>
     </div>
   </div>
 
@@ -128,8 +136,7 @@
         <h2>Hydration Analytics</h2>
         <canvas id="analyticsChart" width="400" height="200"></canvas>
         <div id="currentHydrationStatus">
-          <h3>Current Hydration Status</h3>
-          <p id="dashboardHydrationStatus">N/A</p>
+          <p id="dashboardHydrationStatus">Suggestions: N/A</p>
           <p id="predictedResult">Predicted Result: N/A</p>
           <p id="lastPredictionTime">Last Updated: N/A</p>
           <p id="hydrationDuration">Duration: N/A</p>
