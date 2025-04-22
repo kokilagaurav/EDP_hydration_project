@@ -71,7 +71,7 @@
         <div style="font-size: 1.1em; max-width: 340px; color: #0277bd;">
           <strong style="font-size: 1.2em; display: block; margin-bottom: 8px;">Hydration is essential!</strong>
           Drink enough water every day to keep your body and mind healthy.<br>
-          Your hydration sensor helps you stay on track and maintain optimal hydration levels throughout the day.
+          HyFlow helps you stay on track and maintain optimal hydration levels throughout the day.
         </div>
       </div>
       
@@ -82,11 +82,11 @@
         </div>
         <div class="info-card">
           <h3>How It Works</h3>
-          <p>Our sensor measures your hydration status in real-time using bioimpedance and advanced ML algorithms.</p>
+          <p>HyFlow measures your hydration status in real-time using bioimpedance and advanced ML algorithms.</p>
         </div>
         <div class="info-card">
           <h3>Get Started</h3>
-          <p>Click "Connect" to pair your sensor, then set your daily hydration goal in the Hydration Status tab.</p>
+          <p>Click "Connect" to pair your device, then set your daily hydration goal in the Hydration Status tab.</p>
         </div>
       </div>
     </div>
@@ -154,25 +154,40 @@
     <div id="settingsTab" class="tab-content" style="display: none;">
       <div class="modal-content" style="box-shadow:none; border-radius:0; max-width:none;">
         <h2>Settings</h2>
+        <div class="profile-container" style="display: flex; flex-direction: column; align-items: center; margin-bottom: 24px;">
+          <div id="profileImageContainer" style="width: 120px; height: 120px; border-radius: 50%; background-color: #e1f5fe; overflow: hidden; margin-bottom: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,150,0.1);">
+            <img id="profileImagePreview" src="default-profile.png" alt="Profile Picture" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+            <span id="profileInitials" style="font-size: 3em; color: #0288d1; font-weight: bold;">?</span>
+          </div>
+          <p id="welcomeMessage" style="font-size: 1.2em; color: #0288d1; margin: 8px 0;">Welcome!</p>
+        </div>
         <form id="settingsForm">
-          <label for="profilePicture">Profile Picture:</label>
-          <input type="file" id="profilePicture" accept="image/*"><br><br>
-          <label for="userName">Name:</label>
-          <input type="text" id="userName" placeholder="Enter your name"><br><br>
-          <label for="gender">Gender:</label>
-          <select id="gender">
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-            <option value="other">Other</option>
-          </select><br><br>
-          <label for="activityLevel">Activity Level:</label>
-          <select id="activityLevel">
-            <option value="sedentary">Sedentary</option>
-            <option value="light">Light</option>
-            <option value="moderate">Moderate</option>
-            <option value="active">Active</option>
-          </select><br><br>
-          <button type="button" id="saveSettingsButton">Save</button>
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label for="profilePicture">Profile Picture:</label>
+            <input type="file" id="profilePicture" accept="image/*" style="margin-top: 8px;">
+          </div>
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label for="userName">Name:</label>
+            <input type="text" id="userName" placeholder="Enter your name" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc;">
+          </div>
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label for="gender">Gender:</label>
+            <select id="gender" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc;">
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label for="activityLevel">Activity Level:</label>
+            <select id="activityLevel" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc;">
+              <option value="sedentary">Sedentary</option>
+              <option value="light">Light</option>
+              <option value="moderate">Moderate</option>
+              <option value="active">Active</option>
+            </select>
+          </div>
+          <button type="button" id="saveSettingsButton" style="background-color: #4CAF50; color: white; padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 16px;">Save Settings</button>
         </form>
       </div>
     </div>
@@ -258,6 +273,7 @@
           authModal.style.display = 'none';
           showAppContent();
           loadUserHydrationData(); // Load user-specific data
+          loadUserSettings(); // Load user settings
         })
         .catch(() => {
           localStorage.removeItem('hyflow_token');
@@ -886,6 +902,117 @@
       authError.style.display = 'none';
       
       console.log('Logout complete, form reset to login state');
+    });
+
+    // Settings handling
+    document.getElementById('profilePicture').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          const profileImagePreview = document.getElementById('profileImagePreview');
+          profileImagePreview.src = event.target.result;
+          profileImagePreview.style.display = 'block';
+          document.getElementById('profileInitials').style.display = 'none';
+          
+          // Store image in localStorage (as base64)
+          const imageKey = getUserKey('profileImage');
+          if (imageKey) localStorage.setItem(imageKey, event.target.result);
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Load and display profile image from localStorage
+    function loadUserSettings() {
+      // Only try to load settings if we have a valid user
+      if (!getUserKey('settings')) return;
+      
+      // Load profile image
+      const imageKey = getUserKey('profileImage');
+      const profileImage = localStorage.getItem(imageKey);
+      if (profileImage) {
+        document.getElementById('profileImagePreview').src = profileImage;
+        document.getElementById('profileImagePreview').style.display = 'block';
+        document.getElementById('profileInitials').style.display = 'none';
+      } else {
+        // Show initials if no profile image
+        updateProfileInitials();
+      }
+      
+      // Load other settings
+      const settingsKey = getUserKey('settings');
+      const settings = JSON.parse(localStorage.getItem(settingsKey) || '{}');
+      
+      const userName = document.getElementById('userName');
+      const gender = document.getElementById('gender');
+      const activityLevel = document.getElementById('activityLevel');
+      const welcomeMessage = document.getElementById('welcomeMessage');
+      
+      userName.value = settings.name || '';
+      gender.value = settings.gender || 'male';
+      activityLevel.value = settings.activityLevel || 'moderate';
+      
+      // Update welcome message with name
+      welcomeMessage.textContent = settings.name ? `Welcome, ${settings.name}!` : 'Welcome!';
+    }
+
+    // Update profile initials based on user name
+    function updateProfileInitials() {
+      const settingsKey = getUserKey('settings');
+      const settings = JSON.parse(localStorage.getItem(settingsKey) || '{}');
+      const name = settings.name || '';
+      
+      const initialsElement = document.getElementById('profileInitials');
+      
+      if (name) {
+        const nameParts = name.split(' ');
+        if (nameParts.length > 1) {
+          initialsElement.textContent = (nameParts[0][0] + nameParts[1][0]).toUpperCase();
+        } else {
+          initialsElement.textContent = name[0].toUpperCase();
+        }
+        initialsElement.style.display = 'block';
+        document.getElementById('profileImagePreview').style.display = 'none';
+      } else {
+        initialsElement.textContent = '?';
+        initialsElement.style.display = 'block';
+        document.getElementById('profileImagePreview').style.display = 'none';
+      }
+    }
+
+    // Handle save settings button
+    document.getElementById('saveSettingsButton').addEventListener('click', () => {
+      const userName = document.getElementById('userName').value;
+      const gender = document.getElementById('gender').value;
+      const activityLevel = document.getElementById('activityLevel').value;
+      
+      // Save settings to localStorage
+      const settingsKey = getUserKey('settings');
+      if (settingsKey) {
+        const settings = {
+          name: userName,
+          gender: gender,
+          activityLevel: activityLevel,
+          lastUpdated: new Date().toISOString()
+        };
+        
+        localStorage.setItem(settingsKey, JSON.stringify(settings));
+        
+        // Update welcome message
+        document.getElementById('welcomeMessage').textContent = userName ? `Welcome, ${userName}!` : 'Welcome!';
+        
+        // Update profile initials if no image is set
+        if (!document.getElementById('profileImagePreview').style.display || 
+            document.getElementById('profileImagePreview').style.display === 'none') {
+          updateProfileInitials();
+        }
+        
+        // Show success message
+        alert('Settings saved successfully!');
+      } else {
+        alert('Error: Cannot save settings. Please log in again.');
+      }
     });
 
     // Move this to the very end of the script, after all functions and event listeners
