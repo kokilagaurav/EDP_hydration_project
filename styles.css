@@ -7,7 +7,7 @@ body {
   color: #2d3748;
   line-height: 1.7;
   min-height: 100vh;
-  background-image: linear-gradient(to bottom right, #f8fafc, #e6f7ff);
+  background-image: linear-gradient(135deg, #f8fafc 0%, #e6f7ff 100%);
 }
 
 /* More specific targeting for white dot in hydration analytics */
@@ -100,25 +100,30 @@ h2 {
 }
 
 button {
-  padding: 12px 24px;
+  padding: 14px 28px;
   font-size: 16px;
   margin-right: 12px;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   cursor: pointer;
-  background-color: #0366d6;
+  background-image: linear-gradient(135deg, #0366d6 0%, #0255b8 100%);
   color: white;
   transition: all 0.3s ease;
-  font-weight: 500;
-  box-shadow: 0 4px 10px rgba(0,102,214,0.25);
+  font-weight: 600;
+  box-shadow: 
+    0 4px 12px rgba(0,102,214,0.3),
+    inset 0 1px 0 rgba(255,255,255,0.2);
   position: relative;
   overflow: hidden;
+  letter-spacing: 0.5px;
 }
 
 button:hover {
-  background-color: #0255b8;
-  transform: translateY(-3px);
-  box-shadow: 0 6px 14px rgba(0,102,214,0.35);
+  background-image: linear-gradient(135deg, #0477f4 0%, #0366d6 100%);
+  transform: translateY(-4px);
+  box-shadow: 
+    0 8px 16px rgba(0,102,214,0.4),
+    inset 0 1px 0 rgba(255,255,255,0.2);
 }
 
 button:active {
@@ -215,20 +220,26 @@ button:focus:not(:active)::after {
   text-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
 
-/* Card Styling */
+/* Enhanced Card Styling */
 .feature-card {
-  background: #fff;
-  border-radius: 14px;
-  padding: 28px;
-  box-shadow: 0 10px 25px rgba(0,0,50,0.06), 0 2px 6px rgba(0,0,0,0.04);
-  margin-bottom: 28px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  border: 1px solid rgba(226, 232, 240, 0.8);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 
+    0 10px 25px rgba(0,0,50,0.06),
+    0 4px 8px rgba(0,0,0,0.04),
+    inset 0 0 0 1px rgba(255,255,255,0.5);
+  margin-bottom: 32px;
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
 .feature-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 14px 30px rgba(0,0,50,0.1), 0 4px 8px rgba(0,0,0,0.05);
+  transform: translateY(-8px) scale(1.01);
+  box-shadow: 
+    0 20px 40px rgba(0,0,50,0.12),
+    0 8px 16px rgba(0,0,0,0.06),
+    inset 0 0 0 1px rgba(255,255,255,0.6);
 }
 
 .welcome-card {
@@ -352,33 +363,68 @@ button:focus:not(:active)::after {
   color: #0366d6;
 }
 
-.tracker progress {
+.tracker progress,
+#hydrationProgress {
   width: 100%;
-  height: 28px;
-  border-radius: 14px;
+  height: 32px;
+  border-radius: 16px;
   overflow: hidden;
   margin: 16px 0;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  -webkit-appearance: none;
+  appearance: none;
 }
 
-.tracker progress::-webkit-progress-bar {
+.tracker progress::-webkit-progress-bar,
+#hydrationProgress::-webkit-progress-bar {
   background-color: #f0f0f0;
   border-radius: 14px;
 }
 
-.tracker progress::-webkit-progress-value {
+.tracker progress::-webkit-progress-value,
+#hydrationProgress::-webkit-progress-value {
   background: linear-gradient(90deg, #4299e1, #0366d6);
+  box-shadow: 0 2px 4px rgba(66,153,225,0.3);
+  transition: width 1s cubic-bezier(0.165, 0.84, 0.44, 1);
   border-radius: 14px;
-  transition: width 1s ease;
+}
+
+/* Add reset animation */
+@keyframes resetProgress {
+  from { width: var(--current-progress); }
+  to { width: 0; }
+}
+
+.tracker progress.resetting {
+  animation: resetProgress 0.5s ease-out forwards;
+}
+
+.tracker .reset-message {
+  color: #0366d6;
+  font-size: 0.9em;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+}
+
+.tracker .reset-message.show {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 /* Analytics Dashboard */
 .dashboard {
   margin-top: 24px;
-  padding: 22px;
+  padding: 28px;
   border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  background-color: #fff;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.04);
+  border-radius: 16px;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(10px);
+  box-shadow: 
+    0 12px 30px rgba(0,0,50,0.08),
+    0 4px 8px rgba(0,0,0,0.06),
+    inset 0 0 0 1px rgba(255,255,255,0.5);
 }
 
 .dashboard h2 {
@@ -471,14 +517,16 @@ button:focus:not(:active)::after {
 /* Weather Suggestions */
 .weather {
   margin-top: 24px;
-  padding: 22px;
+  padding: 28px;
   border: 1px solid #bee3f8;
-  border-radius: 12px;
+  border-radius: 16px;
   background: linear-gradient(135deg, #ebf8ff 0%, #e6f7ff 100%);
   font-size: 1.15em;
   color: #0366d6;
   text-align: center;
-  box-shadow: 0 10px 25px rgba(66, 153, 225, 0.15);
+  box-shadow: 
+    0 12px 30px rgba(66,153,225,0.15),
+    inset 0 0 0 1px rgba(255,255,255,0.6);
 }
 
 /* Water Intake Controls */
@@ -509,12 +557,15 @@ button:focus:not(:active)::after {
 
 /* Chart Styling */
 canvas {
-  background-color: #fff;
-  border-radius: 14px;
-  padding: 20px;
-  box-shadow: 0 10px 25px rgba(0,0,50,0.08), 0 2px 6px rgba(0,0,0,0.04);
-  margin: 20px 0;
-  border: 1px solid rgba(226, 232, 240, 0.8);
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 
+    0 12px 30px rgba(0,0,50,0.08),
+    0 4px 8px rgba(0,0,0,0.06),
+    inset 0 0 0 1px rgba(255,255,255,0.5);
+  margin: 24px 0;
 }
 
 /* Tabs Styling */
@@ -525,16 +576,20 @@ canvas {
 }
 
 .tab-button {
-  padding: 12px 24px;
+  padding: 14px 28px;
   font-size: 16px;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   cursor: pointer;
-  background-color: #0366d6;
+  background-image: linear-gradient(135deg, #0366d6 0%, #0255b8 100%);
   color: white;
   margin: 0 6px;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 10px rgba(3, 102, 214, 0.25);
+  font-weight: 600;
+  box-shadow: 
+    0 4px 12px rgba(3,102,214,0.25),
+    inset 0 1px 0 rgba(255,255,255,0.2);
+  letter-spacing: 0.5px;
 }
 
 .tab-button:hover {
@@ -679,19 +734,26 @@ canvas {
 #settingsForm input[type="password"],
 #settingsForm select {
   width: 100%;
-  padding: 14px;
+  padding: 16px;
   border: 1px solid #cbd5e0;
-  border-radius: 8px;
+  border-radius: 12px;
   font-size: 16px;
+  background: rgba(255,255,255,0.9);
+  box-shadow: 
+    0 2px 6px rgba(0,0,0,0.05),
+    inset 0 1px 0 rgba(255,255,255,0.8);
   transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
 }
 
 #settingsForm input:focus,
 #settingsForm select:focus {
   border-color: #0366d6;
   outline: none;
-  box-shadow: 0 0 0 3px rgba(3,102,214,0.2);
+  background: #ffffff;
+  box-shadow: 
+    0 4px 12px rgba(3,102,214,0.15),
+    0 0 0 3px rgba(3,102,214,0.1);
+  transform: translateY(-1px);
 }
 
 #settingsForm button {
@@ -714,7 +776,7 @@ canvas {
   box-shadow: 0 6px 14px rgba(72, 187, 120, 0.35);
 }
 
-/* Profile image container */
+/* Modern Profile Container */
 .profile-container {
   display: flex;
   flex-direction: column;
@@ -723,16 +785,19 @@ canvas {
 }
 
 #profileImageContainer {
-  width: 140px;
-  height: 140px;
+  width: 160px;
+  height: 160px;
   border-radius: 50%;
   overflow: hidden;
   margin-bottom: 20px;
-  background-color: #ebf8ff;
+  background: linear-gradient(135deg, #ebf8ff 0%, #e6f7ff 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 10px 25px rgba(0, 0, 150, 0.15), 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: 
+    0 12px 30px rgba(0, 0, 150, 0.15),
+    0 4px 10px rgba(0, 0, 0, 0.08),
+    inset 0 0 0 2px rgba(255,255,255,0.8);
   transition: transform 0.4s ease, box-shadow 0.4s ease;
   border: 4px solid white;
 }
