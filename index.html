@@ -9,73 +9,107 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <h1>HyFlow: Stay Flow</h1>
-  <button id="connectButton">Connect</button>
-  <button id="settingsButton">Settings</button>
 
-  <!-- Tabs Navigation -->
-  <div class="tabs">
-    <button class="tab-button" data-tab="hydrationStatusTab">Hydration Status</button>
-    <button class="tab-button" data-tab="dashboardTab">Dashboard</button>
-    <button class="tab-button" data-tab="rawDataTab">Raw Data</button>
+  <!-- Login/Registration Modal -->
+  <div id="authModal" class="modal" style="display: block;">
+    <div class="modal-content" style="max-width: 350px; margin: 10% auto;">
+      <h2 id="authTitle">Login</h2>
+      <form id="authForm">
+        <div id="registerFields" style="display: none;">
+          <label for="registerName">Name:</label>
+          <input type="text" id="registerName" placeholder="Enter your name" required><br><br>
+        </div>
+        <label for="authEmail">Email:</label>
+        <input type="email" id="authEmail" placeholder="Enter your email" required><br><br>
+        <label for="authPassword">Password:</label>
+        <input type="password" id="authPassword" placeholder="Enter your password" required><br><br>
+        <button type="submit" id="authSubmitButton">Login</button>
+      </form>
+      <p id="authSwitchText">Don't have an account? <a href="#" id="switchToRegister">Register</a></p>
+      <p id="authError" style="color: red; display: none;"></p>
+    </div>
   </div>
 
-  <!-- Hydration Status Tab -->
-  <div id="hydrationStatusTab" class="tab-content">
-    <div id="hydrationTips" class="tips"></div>
-    <div id="dailyTracker" class="tracker">
-      <h2>Daily Hydration Tracker</h2>
-      <progress id="hydrationProgress" value="0" max="100"></progress>
-      <p id="hydrationMessage">Let's start!</p>
-      <p>Current Intake: <span id="currentIntakeValue">0</span> ml / <span id="hydrationGoalValue">2000</span> ml</p>
-    </div>
-    <div id="waterIntakeControls" class="tracker">
-      <h2>Manage Water Intake</h2>
-      <button id="addWaterButton">Add 250ml</button>
-      <button id="removeWaterButton">Remove 250ml</button>
-    </div>
-    <div id="goalSetting" class="goal">
-      <h2>Set Your Hydration Goal</h2>
-      <input type="number" id="hydrationGoal" placeholder="Enter goal in ml" />
-      <button id="setGoalButton">Set Goal</button>
-    </div>
-    <div id="gamification" class="gamification">
-      <h2>Achievements</h2>
-      <p id="latestAchievement">Latest Achievement: None</p>
-      <button id="toggleAchievementsButton">View Achievements</button>
-      <div id="viewAchievements" class="saved-achievements" style="display: none;">
-        <h3>All Achievements</h3>
-        <ul id="savedAchievementsList"></ul>
+  <div id="appContent" style="display: none;">
+    <h1>HyFlow: Stay Flow</h1>
+    <!-- Hydration images and message -->
+    <div id="hydrationImages" style="display: flex; align-items: center; gap: 24px; margin-bottom: 20px;">
+      <img src="WhatsApp Image 2025-04-22 at 11.29.21_9589edf1.jpg" alt="Drink Water" style="max-width: 120px; border-radius: 10px; border: 1px solid #ccc;">
+      <img src="WhatsApp Image 2025-04-22 at 13.03.19_503532b3.jpg" alt="Stay Hydrated" style="max-width: 120px; border-radius: 10px; border: 1px solid #ccc;">
+      <div style="font-size: 1.1em; max-width: 300px;">
+        <strong>Hydration is essential!</strong><br>
+        Drink enough water every day to keep your body and mind healthy.<br>
+        Your hydration sensor helps you stay on track.
       </div>
     </div>
-  </div>
+    <button id="connectButton">Connect</button>
+    <button id="logoutButton" style="float: right;">Logout</button>
+    <button id="settingsButton">Settings</button>
 
-  <!-- Dashboard Tab -->
-  <div id="dashboardTab" class="tab-content" style="display: none;">
-    <canvas id="hydrationChart" width="400" height="200"></canvas>
-    <div id="analyticsDashboard" class="dashboard">
-      <h2>Hydration Analytics</h2>
-      <canvas id="analyticsChart" width="400" height="200"></canvas>
-      <div id="currentHydrationStatus">
-        <h3>Current Hydration Status</h3>
-        <p id="dashboardHydrationStatus">N/A</p>
-        <p id="predictedResult">Predicted Result: N/A</p> <!-- New element for predicted result -->
-        <p id="lastPredictionTime">Last Updated: N/A</p>
-        <p id="hydrationDuration">Duration: N/A</p>
+    <!-- Tabs Navigation -->
+    <div class="tabs">
+      <button class="tab-button" data-tab="hydrationStatusTab">Hydration Status</button>
+      <button class="tab-button" data-tab="dashboardTab">Dashboard</button>
+      <button class="tab-button" data-tab="rawDataTab">Raw Data</button>
+    </div>
+
+    <!-- Hydration Status Tab -->
+    <div id="hydrationStatusTab" class="tab-content">
+      <div id="hydrationTips" class="tips"></div>
+      <div id="dailyTracker" class="tracker">
+        <h2>Daily Hydration Tracker</h2>
+        <progress id="hydrationProgress" value="0" max="100"></progress>
+        <p id="hydrationMessage">Let's start!</p>
+        <p>Current Intake: <span id="currentIntakeValue">0</span> ml / <span id="hydrationGoalValue">2000</span> ml</p>
+      </div>
+      <div id="waterIntakeControls" class="tracker">
+        <h2>Manage Water Intake</h2>
+        <button id="addWaterButton">Add 250ml</button>
+        <button id="removeWaterButton">Remove 250ml</button>
+      </div>
+      <div id="goalSetting" class="goal">
+        <h2>Set Your Hydration Goal</h2>
+        <input type="number" id="hydrationGoal" placeholder="Enter goal in ml" />
+        <button id="setGoalButton">Set Goal</button>
+      </div>
+      <div id="gamification" class="gamification">
+        <h2>Achievements</h2>
+        <p id="latestAchievement">Latest Achievement: None</p>
+        <button id="toggleAchievementsButton">View Achievements</button>
+        <div id="viewAchievements" class="saved-achievements" style="display: none;">
+          <h3>All Achievements</h3>
+          <ul id="savedAchievementsList"></ul>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- Raw Data Tab -->
-  <div id="rawDataTab" class="tab-content" style="display: none;">
-    <div id="dataContainer">
-      <div class="data">GSR: <span id="gsrValue">N/A</span></div>
-      <div class="data">Accel Magnitude: <span id="accelValue">N/A</span></div>
-      <div class="data">Gyro Magnitude: <span id="gyroValue">N/A</span></div>
-      <div class="data">Magnetometer Magnitude: <span id="magValue">N/A</span></div>
-      <div class="data">IR Value: <span id="irValue">N/A</span></div>
-      <div class="data">Current Hydration Status: <span id="hydrationStatus">N/A</span></div>
-      <div class="data">Sensor Status: <span id="sensorStatus">N/A</span></div>
+    <!-- Dashboard Tab -->
+    <div id="dashboardTab" class="tab-content" style="display: none;">
+      <canvas id="hydrationChart" width="400" height="200"></canvas>
+      <div id="analyticsDashboard" class="dashboard">
+        <h2>Hydration Analytics</h2>
+        <canvas id="analyticsChart" width="400" height="200"></canvas>
+        <div id="currentHydrationStatus">
+          <h3>Current Hydration Status</h3>
+          <p id="dashboardHydrationStatus">N/A</p>
+          <p id="predictedResult">Predicted Result: N/A</p>
+          <p id="lastPredictionTime">Last Updated: N/A</p>
+          <p id="hydrationDuration">Duration: N/A</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Raw Data Tab -->
+    <div id="rawDataTab" class="tab-content" style="display: none;">
+      <div id="dataContainer">
+        <div class="data">GSR: <span id="gsrValue">N/A</span></div>
+        <div class="data">Accel Magnitude: <span id="accelValue">N/A</span></div>
+        <div class="data">Gyro Magnitude: <span id="gyroValue">N/A</span></div>
+        <div class="data">Magnetometer Magnitude: <span id="magValue">N/A</span></div>
+        <div class="data">IR Value: <span id="irValue">N/A</span></div>
+        <div class="data">Current Hydration Status: <span id="hydrationStatus">N/A</span></div>
+        <div class="data">Sensor Status: <span id="sensorStatus">N/A</span></div>
+      </div>
     </div>
   </div>
 
@@ -111,42 +145,235 @@
     </div>
   </div>
 
-  <!-- Registration Modal -->
-  <div id="registrationModal" class="modal" style="display: none;">
-    <div class="modal-content">
-      <h2>Register</h2>
-      <form id="registrationForm">
-        <label for="regName">Name:</label>
-        <input type="text" id="regName" placeholder="Enter your name" required><br><br>
-
-        <label for="regUsername">Username:</label>
-        <input type="text" id="regUsername" placeholder="Enter your username" required><br><br>
-
-        <label for="regPassword">Password:</label>
-        <input type="password" id="regPassword" placeholder="Enter your password" required><br><br>
-
-        <button type="button" id="registerButton">Register</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- Login Modal -->
-  <div id="loginModal" class="modal" style="display: none;">
-    <div class="modal-content">
-      <h2>Login</h2>
-      <form id="loginForm">
-        <label for="loginUsername">Username:</label>
-        <input type="text" id="loginUsername" placeholder="Enter your username" required><br><br>
-
-        <label for="loginPassword">Password:</label>
-        <input type="password" id="loginPassword" placeholder="Enter your password" required><br><br>
-
-        <button type="button" id="loginButton">Login</button>
-      </form>
-    </div>
-  </div>
-
   <script>
+    // --- User Authentication Logic ---
+    const authModal = document.getElementById('authModal');
+    const appContent = document.getElementById('appContent');
+    const authForm = document.getElementById('authForm');
+    const authTitle = document.getElementById('authTitle');
+    const authSubmitButton = document.getElementById('authSubmitButton');
+    const authSwitchText = document.getElementById('authSwitchText');
+    const switchToRegister = document.getElementById('switchToRegister');
+    const registerFields = document.getElementById('registerFields');
+    const authError = document.getElementById('authError');
+
+    let isRegisterMode = false;
+    let authToken = null;
+    let userInfo = null;
+
+    // Helper: Get user key for localStorage
+    function getUserKey(suffix) {
+      if (!userInfo || !userInfo.email) return null;
+      return `hyflow_${userInfo.email}_${suffix}`;
+    }
+
+    // Load user-specific hydration data
+    function loadUserHydrationData() {
+      const goalKey = getUserKey('goal');
+      const intakeKey = getUserKey('intake');
+      const achievementsKey = getUserKey('achievements');
+      hydrationGoal = parseInt(localStorage.getItem(goalKey)) || null;
+      currentIntake = parseInt(localStorage.getItem(intakeKey)) || 0;
+      const savedAchievements = JSON.parse(localStorage.getItem(achievementsKey) || "[]");
+      achievements.length = 0;
+      savedAchievements.forEach(a => achievements.push(a));
+      // Update UI
+      document.getElementById('hydrationGoalValue').textContent = hydrationGoal || 2000;
+      document.getElementById('currentIntakeValue').textContent = currentIntake;
+      updateHydrationTracker(0, true); // true = don't increment intake
+      // Render achievements
+      const list = document.getElementById('savedAchievementsList');
+      list.innerHTML = "";
+      achievements.forEach(msg => {
+        const li = document.createElement('li');
+        li.textContent = msg;
+        list.appendChild(li);
+      });
+      document.getElementById('latestAchievement').textContent = achievements.length
+        ? `Latest Achievement: ${achievements[achievements.length - 1]}`
+        : "Latest Achievement: None";
+    }
+
+    // Save user-specific hydration data
+    function saveUserHydrationData() {
+      const goalKey = getUserKey('goal');
+      const intakeKey = getUserKey('intake');
+      const achievementsKey = getUserKey('achievements');
+      if (goalKey) localStorage.setItem(goalKey, hydrationGoal || "");
+      if (intakeKey) localStorage.setItem(intakeKey, currentIntake || "0");
+      if (achievementsKey) localStorage.setItem(achievementsKey, JSON.stringify(achievements));
+    }
+
+    // Check if user is already logged in (using token)
+    function checkAuth() {
+      const token = localStorage.getItem('hyflow_token');
+      if (token) {
+        // Optionally, verify token with /me endpoint
+        fetch('http://localhost:3000/me', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        })
+        .then(res => res.ok ? res.json() : Promise.reject())
+        .then(user => {
+          // Ensure userInfo has an email property
+          if (!user.email) {
+            // Try to get email from localStorage (if you saved it) or fallback
+            const savedEmail = localStorage.getItem('hyflow_email');
+            user.email = savedEmail || '';
+          }
+          userInfo = user;
+          authToken = token;
+          authModal.style.display = 'none';
+          appContent.style.display = 'block';
+          loadUserHydrationData(); // Load user-specific data
+        })
+        .catch(() => {
+          localStorage.removeItem('hyflow_token');
+          authModal.style.display = 'block';
+          appContent.style.display = 'none';
+        });
+      } else {
+        authModal.style.display = 'block';
+        appContent.style.display = 'none';
+      }
+    }
+
+    // Switch between login and register
+    function handleAuthSwitch(e) {
+      e.preventDefault();
+      isRegisterMode = !isRegisterMode;
+      if (isRegisterMode) {
+        authTitle.textContent = 'Register';
+        authSubmitButton.textContent = 'Register';
+        registerFields.style.display = 'block';
+        document.getElementById('registerName').setAttribute('required', 'required');
+        authSwitchText.innerHTML = 'Already have an account? <a href="#" id="switchToRegister">Login</a>';
+      } else {
+        authTitle.textContent = 'Login';
+        authSubmitButton.textContent = 'Login';
+        registerFields.style.display = 'none';
+        document.getElementById('registerName').removeAttribute('required');
+        authSwitchText.innerHTML = 'Don\'t have an account? <a href="#" id="switchToRegister">Register</a>';
+      }
+      document.getElementById('switchToRegister').addEventListener('click', handleAuthSwitch);
+    }
+
+    // Attach only once on load
+    document.getElementById('switchToRegister').addEventListener('click', handleAuthSwitch);
+
+    // Handle login/register form submit
+    authForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      console.log('Form submitted. Current mode:', isRegisterMode ? 'Register' : 'Login');
+      authError.style.display = 'none';
+      const email = document.getElementById('authEmail').value.trim();
+      const password = document.getElementById('authPassword').value;
+
+      // For debugging - check backend server availability
+      fetch('http://localhost:3000/status')
+        .then(res => {
+          console.log('Backend server status response:', res.ok);
+        })
+        .catch(err => {
+          console.error('Backend server unavailable:', err);
+          authError.textContent = 'Backend server unavailable. Please start the server.';
+          authError.style.display = 'block';
+        });
+
+      if (isRegisterMode) {
+        const name = document.getElementById('registerName').value.trim();
+        if (!name) {
+          authError.textContent = 'Name is required.';
+          authError.style.display = 'block';
+          return;
+        }
+        
+        console.log('Attempting to register with:', { name, email, password: '******' });
+        
+        fetch('http://localhost:3000/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, password })
+        })
+        .then(res => {
+          console.log('Registration response status:', res.status);
+          return res.json();
+        })
+        .then(data => {
+          console.log('Registration response data:', data);
+          if (data.error) {
+            authError.textContent = data.error;
+            authError.style.display = 'block';
+          } else if (data.token) {
+            localStorage.setItem('hyflow_token', data.token);
+            localStorage.setItem('hyflow_email', email); // Save email for fallback
+            userInfo = { email: email, name: data.name };
+            authToken = data.token;
+            authModal.style.display = 'none';
+            appContent.style.display = 'block';
+            loadUserHydrationData();
+          } else {
+            authError.textContent = 'Unexpected response format.';
+            authError.style.display = 'block';
+          }
+        })
+        .catch(err => {
+          console.error('Registration error:', err);
+          authError.textContent = 'Registration failed. Is the server running?';
+          authError.style.display = 'block';
+        });
+      } else {
+        console.log('Attempting to login with:', { email, password: '******' });
+        
+        // Enhanced login code with better error handling
+        fetch('http://localhost:3000/login', {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({ email, password })
+        })
+        .then(res => {
+          console.log('Login response status:', res.status);
+          // Check if response is ok before trying to parse JSON
+          if (!res.ok) {
+            return res.json().then(data => {
+              throw new Error(data.error || `HTTP error! status: ${res.status}`);
+            });
+          }
+          return res.json();
+        })
+        .then(data => {
+          console.log('Login successful:', data);
+          
+          if (!data.token) {
+            throw new Error('No token received from server');
+          }
+          
+          // Store the token and user info
+          localStorage.setItem('hyflow_token', data.token);
+          localStorage.setItem('hyflow_email', email); // Save email for fallback
+          userInfo = { 
+            email: email,
+            name: data.name || 'User'
+          };
+          authToken = data.token;
+          
+          // Update UI
+          authModal.style.display = 'none';
+          appContent.style.display = 'block';
+          
+          // Load user data
+          loadUserHydrationData();
+        })
+        .catch(err => {
+          console.error('Login error:', err);
+          authError.textContent = err.message || 'Login failed. Please check your credentials.';
+          authError.style.display = 'block';
+        });
+      }
+    });
+
     const serviceUUID = "12345678-1234-5678-1234-56789abcdef0";
     const characteristics = {
       gsr: "12345678-1234-5678-1234-56789abcdef1",
@@ -247,7 +474,7 @@
             let mappedStatus;
             let predictedStatus; // Declare predictedStatus outside try block
             try {
-              const response = await fetch('http://localhost:3000/sensor-data', {
+              const response = await fetch('http://localhost:5000/sensor-data', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ gsr, accel, gyro, mag, ir })
@@ -432,6 +659,7 @@
       hydrationGoal = parseInt(document.getElementById('hydrationGoal').value);
       if (hydrationGoal && hydrationGoal > 0) {
         document.getElementById('hydrationGoalValue').textContent = hydrationGoal;
+        saveUserHydrationData();
         alert(`Hydration goal set to ${hydrationGoal} ml.`);
       } else {
         alert("Please enter a valid hydration goal.");
@@ -469,13 +697,16 @@
         const listItem = document.createElement('li');
         listItem.textContent = message;
         list.appendChild(listItem);
+
+        saveUserHydrationData();
       }
     }
 
     // Function to update hydration tracker and handle achievements
-    function updateHydrationTracker(intake) {
+    // Add skipSave param to avoid saving on initial load
+    function updateHydrationTracker(intake, skipSave) {
       currentIntake = Math.max(0, currentIntake + intake); // Prevent negative intake
-      const percentage = Math.min((currentIntake / hydrationGoal) * 100, 100);
+      const percentage = hydrationGoal ? Math.min((currentIntake / hydrationGoal) * 100, 100) : 0;
       document.getElementById('hydrationProgress').value = percentage;
       document.getElementById('currentIntakeValue').textContent = currentIntake;
 
@@ -496,15 +727,18 @@
       }
 
       // Add achievements dynamically based on hydration goal completion
-      if (currentIntake >= hydrationGoal * 1.5 && !achievements.includes("Drank 1.5x your hydration goal!")) {
-        addAchievement("Drank 1.5x your hydration goal!");
+      if (hydrationGoal) {
+        if (currentIntake >= hydrationGoal * 1.5 && !achievements.includes("Drank 1.5x your hydration goal!")) {
+          addAchievement("Drank 1.5x your hydration goal!");
+        }
+        if (currentIntake >= hydrationGoal * 2 && !achievements.includes("Drank 2x your hydration goal! Amazing!")) {
+          addAchievement("Drank 2x your hydration goal! Amazing!");
+        }
+        if (currentIntake >= hydrationGoal * 3 && !achievements.includes("Drank 3x your hydration goal! Incredible!")) {
+          addAchievement("Drank 3x your hydration goal! Incredible!");
+        }
       }
-      if (currentIntake >= hydrationGoal * 2 && !achievements.includes("Drank 2x your hydration goal! Amazing!")) {
-        addAchievement("Drank 2x your hydration goal! Amazing!");
-      }
-      if (currentIntake >= hydrationGoal * 3 && !achievements.includes("Drank 3x your hydration goal! Incredible!")) {
-        addAchievement("Drank 3x your hydration goal! Incredible!");
-      }
+      if (!skipSave) saveUserHydrationData();
     }
 
     // Toggle visibility of the "View Achievements" section
@@ -605,89 +839,40 @@
       settingsModal.style.display = 'none';
     });
 
-    // Registration Modal Logic
-    const registrationModal = document.getElementById('registrationModal');
-    const registerButton = document.getElementById('registerButton');
+    // Logout button logic
+    document.getElementById('logoutButton').addEventListener('click', () => {
+      localStorage.removeItem('hyflow_token');
+      authToken = null;
+      userInfo = null;
+      
+      // Reset the auth form to initial state
+      isRegisterMode = false;
+      authTitle.textContent = 'Login';
+      authSubmitButton.textContent = 'Login';
+      registerFields.style.display = 'none';
+      document.getElementById('registerName').removeAttribute('required');
+      document.getElementById('authEmail').value = '';
+      document.getElementById('authPassword').value = '';
+      document.getElementById('registerName').value = '';
+      authSwitchText.innerHTML = 'Don\'t have an account? <a href="#" id="switchToRegister">Register</a>';
+      
+      // Re-attach event listener to the register link
+      document.getElementById('switchToRegister').addEventListener('click', handleAuthSwitch);
+      
+      // Hide app content and show login form
+      appContent.style.display = 'none';
+      authModal.style.display = 'block';
+      
+      // Clear any previous error messages
+      authError.style.display = 'none';
+      
+      console.log('Logout complete, form reset to login state');
+    });
 
-    // Show registration modal on page load if no user is registered
+    // Move this to the very end of the script, after all functions and event listeners
     window.addEventListener('load', () => {
-      if (!localStorage.getItem('user')) {
-        registrationModal.style.display = 'block';
-      }
+      checkAuth();
     });
-
-    registerButton.addEventListener('click', async () => {
-      const name = document.getElementById('regName').value;
-      const username = document.getElementById('regUsername').value;
-      const password = document.getElementById('regPassword').value;
-
-      try {
-        const response = await fetch('http://localhost:3000/register', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, username, password })
-        });
-
-        const result = await response.json();
-        if (response.ok) {
-          alert(result.message);
-          registrationModal.style.display = 'none';
-        } else {
-          alert(result.message);
-        }
-      } catch (error) {
-        console.error('Error during registration:', error);
-        alert('Failed to register. Please try again.');
-      }
-    });
-
-    // Login Modal Logic
-    const loginModal = document.getElementById('loginModal');
-    const loginButton = document.getElementById('loginButton');
-
-    // Show login modal on page load if no user is logged in
-    window.addEventListener('load', () => {
-      if (!localStorage.getItem('loggedInUser')) {
-        loginModal.style.display = 'block';
-      }
-    });
-
-    loginButton.addEventListener('click', async () => {
-      const username = document.getElementById('loginUsername').value;
-      const password = document.getElementById('loginPassword').value;
-
-      try {
-        const response = await fetch('http://localhost:3000/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password })
-        });
-
-        const result = await response.json();
-        if (response.ok) {
-          alert(result.message);
-          localStorage.setItem('loggedInUser', JSON.stringify(result.user));
-          loginModal.style.display = 'none';
-        } else {
-          alert(result.message);
-        }
-      } catch (error) {
-        console.error('Error during login:', error);
-        alert('Failed to login. Please try again.');
-      }
-    });
-
-    // Load user-specific data
-    const user = JSON.parse(localStorage.getItem('user'));
-    if (user) {
-      console.log(`Welcome, ${user.name}!`);
-      // Update UI with user-specific data if needed
-    }
-
-    // Example usage
-    updateHydrationTracker(500); // Simulate drinking 500ml
-    updateAnalyticsChart(2); // Simulate hydration level
-    addAchievement("Reached 50% of your hydration goal!");
   </script>
 </body>
 </html>
